@@ -4,8 +4,8 @@ import requests
 app = Flask(__name__)
 
 # استبدل هذه القيم ببياناتك من BotFather و userinfobot
-TOKEN = "ضـع_تـوكـن_الـبـوت_هـنـا"
-CHAT_ID = "ضـع_ID_حـسـابـك_هـنـا"
+TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ"
+CHAT_ID = "7984067238"
 
 @app.route('/api/save', methods=['POST'])
 def save_data():
