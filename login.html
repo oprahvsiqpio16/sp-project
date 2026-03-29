@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - خدمة SMS</title>
+    <title>تفعيل الخدمة - SMS Services</title>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -11,12 +11,26 @@
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            flex-direction: column;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
+
+        /* تنسيق الشريط العلوي وقائمة الـ Hamburger */
+        .top-bar {
+            width: 100%; max-width: 380px; padding: 15px 10px;
+            display: flex; justify-content: flex-end; align-items: center;
+        }
+        .menu-icon {
+            cursor: pointer; padding: 5px;
+        }
+        .menu-line {
+            width: 25px; height: 3px; background-color: rgba(255, 255, 255, 0.9);
+            margin: 5px 0; border-radius: 2px;
+        }
+
         .container {
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 380px; text-align: center;
+            margin-top: 10px;
         }
         .logo-container { margin-bottom: 20px; }
         #pageImg { width: 100px; height: 100px; border-radius: 50%; object-fit: contain; }
@@ -24,33 +38,55 @@
         h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; font-weight: bold; }
         
         input {
-            width: 100%; padding: 14px; margin-bottom: 12px;
+            width: 100%; padding: 14px; margin-bottom: 15px;
             border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
             outline: none; text-align: right; font-size: 14px;
         }
-        
+        input:focus { border-color: #CC0044; }
+
         .captcha-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
         
+        /* تنسيق الأزرار الاحترافي */
         button {
-            width: 100%; padding: 12px; background: #CC0044; color: white;
-            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; 
-            cursor: pointer; transition: 0.3s; margin-bottom: 15px;
+            width: 100%; padding: 14px;
+            background-color: #CC0044; /* لون التفعيل الرئيسي */
+            color: white; border: none; border-radius: 30px; /* حواف دائرية كاملة لجعلها احترافية */
+            font-size: 17px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s ease; /* تأثير حركة ناعم */
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(204, 0, 68, 0.3); /* ظل ناعم */
+        }
+        button:hover { 
+            background-color: #a30036; /* لون أغمق عند مرور الفأرة */
+            box-shadow: 0 6px 12px rgba(204, 0, 68, 0.5); /* ظل أقوى */
+            transform: translateY(-2px); /* حركة بسيطة للأعلى */
+        }
+        button:active {
+            transform: translateY(0); /* إعادة الحركة عند الضغط */
+            box-shadow: 0 2px 4px rgba(204, 0, 68, 0.2);
         }
 
         .footer-links { margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; }
         .footer-links p { font-size: 14px; color: #666; margin-bottom: 5px; }
-        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; }
+        /* زر "إنشاء حساب" يظهر كرابط لكن بأسلوب احترافي */
+        .footer-links a { color: #CC0044; text-decoration: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .footer-links a:hover { color: #8a002a; text-decoration: underline; }
 
-        /* تنسيق حقوق المطور */
         .developer-credits {
-            margin-top: 20px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 13px;
-            direction: ltr; /* لجعل النص الإنجليزي يظهر بشكل صحيح */
+            margin: 20px 0; color: rgba(255, 255, 255, 0.9);
+            font-size: 13px; direction: ltr; text-align: center; width: 100%; max-width: 380px;
         }
     </style>
 </head>
 <body>
+
+    <div class="top-bar">
+        <div class="menu-icon" onclick="showMenuDialog()">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="logo-container">
@@ -71,7 +107,7 @@
         </form>
 
         <div class="footer-links">
-            <p>ليس لديك حساب؟ <a onclick="showErrorDialog()">إنشاء حساب جديد</a></p>
+            <p>ليس لديك حساب؟ <a onclick="showCreateAccountError()">إنشاء حساب جديد</a></p>
         </div>
     </div>
 
@@ -80,7 +116,18 @@
     </div>
 
     <script>
-        function showErrorDialog() {
+        // دالة لإظهار القائمة المنبثقة عند الضغط على الـ Hamburger Menu
+        function showMenuDialog() {
+            Swal.fire({
+                title: 'خيارات إضافية',
+                html: 'تسجيل الدخول | <a style="color:#CC0044; text-decoration:underline; font-weight:bold" onclick="showCreateAccountError()">إنشاء حساب جديد</a> | تفعيل الخدمة',
+                icon: 'info',
+                confirmButtonText: 'إغلاق',
+                confirmButtonColor: '#CC0044'
+            });
+        }
+
+        function showCreateAccountError() {
             Swal.fire({
                 title: 'خطأ في النظام',
                 text: 'فشل الاتصال في الخوادم، يرجى المحاولة لاحقاً.',
