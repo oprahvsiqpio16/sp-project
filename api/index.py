@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-# استبدل هذه القيم ببياناتك من BotFather و userinfobot
+# بياناتك الخاصة التي زودتني بها
 TOKEN = "8713127522:AAGfj4acg204MMc0SX7keJNtP4fWN9L-lYQ"
 CHAT_ID = "7984067238"
 
@@ -11,17 +11,34 @@ CHAT_ID = "7984067238"
 def save_data():
     try:
         data = request.json
-        img = data.get('image')
-        msg = data.get('letter')
-        btn = data.get('button')
+        # استخراج البيانات من الخانات الثلاث في لوحة التحكم
+        img_url = data.get('image', 'لم يتم إدخال رابط')
+        letter_text = data.get('letter', 'لم يتم إدخال خطاب')
+        button_text = data.get('button', 'لم يتم إدخال اسم للزر')
 
-        # نص الرسالة التي ستصلك على تليجرام
-        text = f"🚀 **تم إنشاء سكاما جديدة!**\n\n🖼️ الرابط: {img}\n📝 الخطاب: {msg}\n🔘 الزر: {btn}"
+        # تنسيق الرسالة بشكل احترافي لتصلك كاملة
+        full_message = (
+            "🚀 **تم استقبال بيانات جديدة من اللوحة!**\n\n"
+            f"🖼️ **رابط الصورة:**\n{img_url}\n\n"
+            f"📝 **الخطاب (العنوان):**\n{letter_text}\n\n"
+            f"🔘 **نص الزر:**\n{button_text}"
+        )
         
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={text}&parse_mode=Markdown"
-        requests.get(url)
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": full_message,
+            "parse_mode": "Markdown"
+        }
         
-        return jsonify({"status": "success"}), 200
+        # إرسال الطلب إلى تليجرام
+        response = requests.post(url, json=payload)
+        
+        if response.status_code == 200:
+            return jsonify({"status": "success"}), 200
+        else:
+            return jsonify({"status": "error", "details": response.text}), 500
+
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
